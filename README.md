@@ -1,66 +1,60 @@
-#NomadNest
-Nomadnest es una aplicación diseñada para los viajeros que buscan planificar sus aventuras de manera eficiente y descubrir nuevos destinos de forma sencilla.
+# NomadNest
 
-#Características
+Nomadnest es una aplicación diseñada para los viajeros que buscan planificar sus aventuras de manera eficiente y descubrir nuevos destinos de forma sencilla. Además, permite gestionar tareas relacionadas con los viajes, iniciar sesión y registrar nuevos usuarios.
 
-Planificación de Viajes: Organiza tus itinerarios, fechas, vuelos y reservas de alojamiento en un solo lugar.
+# Características
 
-Búsqueda de Destinos: Explora y encuentra nuevos lugares de interés con recomendaciones personalizadas.
+- **Planificación de Viajes:** Organiza tus itinerarios, fechas, vuelos y reservas de alojamiento en un solo lugar.
+- **Búsqueda de Destinos:** Explora y encuentra nuevos lugares de interés con recomendaciones personalizadas.
+- **Lista de Tareas:** Crea y gestiona listas de cosas por hacer antes y durante tu viaje.
+- **Autenticación de Usuarios:** Regístrate y accede con tu cuenta personal (con validación mediante una base de datos).
+- **Gestión de Usuarios:** Registro de nuevos usuarios con nombre, apellidos, correo electrónico y contraseña.
+- **Compartir Itinerarios:** Comparte tus planes de viaje con amigos o familiares.
+- **Seguimiento de Gastos:** Mantén un control de tu presupuesto de viaje.
 
-Lista de Tareas: Crea y gestiona listas de cosas por hacer antes y durante tu viaje.
+# Tecnologías Utilizadas
 
-Compartir Itinerarios: Comparte tus planes de viaje con amigos o familiares.
+- **Lenguaje:** Swift
+- **Frameworks:** SwiftUI, UIKit, Core Data, Combine
+- **Backend:** Node.js, Express, SQLite (en lugar de PostgreSQL)
+- **Herramientas:** Xcode, CocoaPods, TestFlight
 
-Seguimiento de Gastos: Mantén un control de tu presupuesto de viaje.
+# Instalación
 
-#Tecnologías Utilizadas
+1. Clona el repositorio.
+2. Abre el proyecto en Xcode.
+3. Instala las dependencias necesarias.
+4. Corre el proyecto en el simulador o en tu dispositivo iOS.
 
-Lenguaje: Swift
+# Uso
 
-Frameworks: SwiftUI, UIKit, Core Data, Combine
+1. **Registro e Inicio de sesión:**
+   - Puedes crear una nueva cuenta de usuario o iniciar sesión con tus credenciales existentes.
+   - El registro incluye los campos de nombre, apellidos, correo electrónico y contraseña, que se almacenan en una base de datos SQLite.
 
-Herramientas: Xcode, CocoaPods, TestFlight
+2. **Planificación de tu viaje:**
+   - Agrega fechas, ubicaciones y actividades relacionadas con tu viaje.
+   - Administra tu itinerario y controla los detalles esenciales de tu aventura.
 
-#Instalación
+3. **Búsqueda de destinos:**
+   - Explora y encuentra nuevos lugares según tus preferencias, con recomendaciones personalizadas.
 
-Clona el repositorio:
+4. **Administración de tareas:**
+   - Organiza tus tareas antes de partir y haz un seguimiento de lo que necesitas llevar, reservar, etc.
 
-git clone https://github.com/tu-usuario/nomadnest.git
+5. **Control de gastos:**
+   - Mantén un registro detallado de tus gastos para gestionar mejor tu presupuesto de viaje.
 
-Abre el proyecto en Xcode:
+# Contribución
 
-open Nomadnest.xcodeproj
+Si deseas contribuir al desarrollo de NomadNest:
 
-Instala las dependencias necesarias:
+1. Haz un fork del repositorio.
+2. Crea una rama para tu función o arreglo de bug.
+3. Realiza los cambios necesarios.
+4. Envía un pull request con una descripción detallada de los cambios realizados.
 
-pod install
+# Contacto
 
-Corre el proyecto en el simulador o en tu dispositivo iOS:
-
-Cmd + R
-
-#Uso
-
-Registro: Crea una cuenta o inicia sesión.
-
-Planifica tu viaje: Agrega fechas, ubicaciones y actividades.
-
-Busca destinos: Descubre lugares según tus preferencias.
-
-Administra tu lista de tareas: Organiza lo que necesitas antes de partir.
-
-Controla tus gastos: Mantén un registro detallado de tus gastos.
-
-#Contribución
-
-Si deseas contribuir al desarrollo de Nomadnest:
-
-Haz un fork del repositorio.
-
-Crea una rama para tu función o arreglo de bug.
-
-Envía un pull request con una descripción detallada de los cambios.
-
-Contacto
-
-Para cualquier duda o sugerencia, no dudes en contactarnos en correo@nomadnest.com.
+Para cualquier duda o sugerencia, no dudes en contactarnos en:  
+**Correo electrónico:** rocionintendo29@gmail.com
