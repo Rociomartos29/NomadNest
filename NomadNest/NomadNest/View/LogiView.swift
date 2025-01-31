@@ -61,7 +61,7 @@ struct LoginView: View {
                 })
                 
                 // Navegar a la pantalla de TripList cuando login es exitoso
-                NavigationLink(destination: TripListView(), isActive: $isLoggedIn) {
+                NavigationLink(destination: ExploreView(), isActive: $isLoggedIn) {
                     EmptyView()
                 }
                 

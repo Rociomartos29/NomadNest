@@ -15,7 +15,7 @@ struct Trip: Identifiable {
     var tasks: [String]
 }
 struct Destination: Identifiable, Decodable {
-    var id: String { title } // Para que sea identificable en List
+    var id: String { title } 
     let title: String
     let summary: String
     let url: String
@@ -25,7 +25,7 @@ struct GeoNamesResponse: Decodable {
     let geonames: [Destination]
 }
 struct DestinationSuggestion: Identifiable, Decodable {
-    let id = UUID()  // Esto hace que sea Identifiable
+    let id = UUID()
     let city: String
     let country: String
     let description: String
@@ -37,7 +37,7 @@ struct DestinationSuggestion: Identifiable, Decodable {
             case country
             case description
             case category
-            case imageURL = "image_url" // Si en el JSON la clave es "image_url" en lugar de "imageURL"
+            case imageURL = "image_url" //
         }
 }
 // Estructura para representar un usuario

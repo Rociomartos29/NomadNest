@@ -15,7 +15,7 @@ struct LoadingView: View {
         NavigationStack {
             ZStack {
                 // Imagen de fondo
-                Image("fondo") // Nombre de tu imagen
+                Image("fondo") 
                     .resizable()
                     .scaledToFill()
                     .edgesIgnoringSafeArea(.all) // Hace que la imagen cubra toda la pantalla
