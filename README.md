@@ -45,15 +45,6 @@ Nomadnest es una aplicación diseñada para los viajeros que buscan planificar s
 5. **Control de gastos:**
    - Mantén un registro detallado de tus gastos para gestionar mejor tu presupuesto de viaje.
 
-# Contribución
-
-Si deseas contribuir al desarrollo de NomadNest:
-
-1. Haz un fork del repositorio.
-2. Crea una rama para tu función o arreglo de bug.
-3. Realiza los cambios necesarios.
-4. Envía un pull request con una descripción detallada de los cambios realizados.
-
 # Contacto
 
 Para cualquier duda o sugerencia, no dudes en contactarnos en:  
