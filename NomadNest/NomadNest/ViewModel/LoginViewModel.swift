@@ -10,17 +10,26 @@ class LoginViewModel: ObservableObject {
     @Published var email = ""
     @Published var password = ""
     @Published var responseMessage = ""
+    @Published var isLoggedIn = false
     
     func login() {
-        // Realizar la llamada de login a tu API o backend
+        // Llamada al servicio de red para hacer el login
         NetworkService.shared.login(username: email, password: password) { result in
             switch result {
             case .success(let response):
                 if let message = response["message"] as? String {
-                    self.responseMessage = message
+                    DispatchQueue.main.async {
+                        if message == "Login exitoso" {
+                            self.isLoggedIn = true
+                        } else {
+                            self.responseMessage = message
+                        }
+                    }
                 }
             case .failure(let error):
-                self.responseMessage = "Error: \(error.localizedDescription)"
+                DispatchQueue.main.async {
+                    self.responseMessage = "Error: \(error.localizedDescription)"
+                }
             }
         }
     }

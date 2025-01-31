@@ -10,9 +10,8 @@ import SwiftUI
 struct LoginView: View {
     @State private var email = ""
     @State private var password = ""
-    @State private var isNavigatingToRegister = false
-    @State private var isLoggedIn = false
     @State private var responseMessage = ""
+    @State private var isLoggedIn = false
     
     var body: some View {
         NavigationView {
@@ -55,11 +54,11 @@ struct LoginView: View {
                     .padding()
                 
                 // Navegación al registro
-                NavigationLink(destination: RegisterView(), isActive: $isNavigatingToRegister) {
+                NavigationLink(destination: RegisterView(), label: {
                     Text("¿No tienes cuenta? Regístrate")
                         .foregroundColor(.blue)
                         .padding()
-                }
+                })
                 
                 // Navegar a la pantalla de TripList cuando login es exitoso
                 NavigationLink(destination: TripListView(), isActive: $isLoggedIn) {
@@ -68,7 +67,6 @@ struct LoginView: View {
                 
                 Spacer()
             }
-            
             .padding()
         }
     }
