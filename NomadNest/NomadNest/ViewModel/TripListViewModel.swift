@@ -7,8 +7,8 @@
 
 import Foundation
 
-class TripListViewModel: ObservableObject {
-    @Published var trips: [Destination] = []
+/*class TripListViewModel: ObservableObject {
+    @Published var trips: [DestinationSuggestion] = []
     @Published var isLoading: Bool = false
     private let username = "rociomartos"  // Sustituye con tu nombre de usuario de GeoNames
 
@@ -68,3 +68,5 @@ class TripListViewModel: ObservableObject {
         }
     }
 }
+
+*/

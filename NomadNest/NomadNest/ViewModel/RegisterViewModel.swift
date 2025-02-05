@@ -8,22 +8,34 @@
 import Foundation
 
 class RegisterViewModel: ObservableObject {
-    @Published var firstName = ""
-    @Published var lastName = ""
+    @Published var nombre = ""
+    @Published var apellido = ""
     @Published var email = ""
     @Published var password = ""
-    @Published var responseMessage = ""
+    @Published var responseMessage: String = ""
+    @Published var isRegistered: Bool = false
+    @Published var isError: Bool = false
+    
     
     func register() {
-        // Realizar la llamada de registro a tu API o backend
-        NetworkService.shared.register(username: email, password: password, firstName: firstName, lastName: lastName) { result in
+        print("Intentando registrar usuario con los siguientes datos:")
+        print("Nombre: \(nombre), Apellido: \(apellido), Email: \(email), Contraseña: \(password)")
+        
+        NetworkService.shared.register(nombre: nombre, apellidos: apellido, email: email, password: password) { result in
             switch result {
             case .success(let response):
-                if let message = response["message"] as? String {
-                    self.responseMessage = message
+                print("Registro exitoso: \(response)")
+                DispatchQueue.main.async {
+                    // Al recibir éxito, cambiamos el estado de registro a verdadero
+                    self.responseMessage = "Usuario registrado exitosamente"
+                    self.isError = false
+                    self.isRegistered = true // Cambiar a true para activar el NavigationLink
                 }
             case .failure(let error):
-                self.responseMessage = "Error: \(error.localizedDescription)"
+                print("Error al registrar: \(error.localizedDescription)")
+                DispatchQueue.main.async {
+                    self.responseMessage = "Error: \(error.localizedDescription)"
+                }
             }
         }
     }

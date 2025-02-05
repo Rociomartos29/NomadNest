@@ -35,22 +35,28 @@ app.get('/check-tables', (req, res) => {
 
 // Ruta de login
 app.post('/login', (req, res) => {
-    const { email, password } = req.body;
-  
-    // Consulta para validar el login con email y password
-    const query = `SELECT * FROM users WHERE email = ? AND password = ?`;
-  
-    db.get(query, [email, password], (err, row) => {
-      if (err) {
-        return res.status(500).json({ message: 'Error en el servidor', error: err.message });
-      }
-      if (row) {
-        return res.json({ message: 'Login exitoso', user: row });
-      } else {
-        return res.status(401).json({ message: 'Credenciales incorrectas' });
-      }
-    });
+  const { email, password } = req.body;
+
+  // Imprimir los datos que llegaron desde el cliente
+  console.log('Datos recibidos en el login:', { email, password });
+
+  // Consulta para validar el login con email y password
+  const query = `SELECT * FROM users WHERE email = ? AND password = ?`;
+
+  db.get(query, [email, password], (err, row) => {
+    if (err) {
+      console.log('Error en la consulta SQL:', err.message);  // Imprimir el error de la base de datos
+      return res.status(500).json({ message: 'Error en el servidor', error: err.message });
+    }
+    if (row) {
+      console.log('Usuario encontrado:', row);  // Imprimir el usuario encontrado
+      return res.json({ message: 'Login exitoso', user: row });
+    } else {
+      console.log('Credenciales incorrectas');  // Imprimir mensaje si no se encuentra el usuario
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
+    }
   });
+});
 
 // Ruta de registro
 app.post('/register', (req, res) => {
@@ -92,7 +98,6 @@ app.post('/register', (req, res) => {
         console.error('Error al obtener destinos:', err.message); // Depuración
         return res.status(500).json({ message: 'Error al obtener destinos', error: err.message });
       }
-      console.log('Destinos recuperados:', rows); // Depuración
       res.json({ destinations: rows });
     });
   });

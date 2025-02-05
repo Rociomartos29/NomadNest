@@ -14,45 +14,45 @@ struct Trip: Identifiable {
     var endDate: Date
     var tasks: [String]
 }
-struct Destination: Identifiable, Decodable {
-    var id: String { title } 
-    let title: String
-    let summary: String
-    let url: String
-}
 
-struct GeoNamesResponse: Decodable {
-    let geonames: [Destination]
-}
-struct DestinationSuggestion: Identifiable, Decodable {
-    let id = UUID()
-    let city: String
+// Estructura para un destino individual
+struct Destination: Decodable, Identifiable {
+    let id: Int
+    let title: String
     let country: String
     let description: String
     let category: String
-    let imageURL: String
+    let imageUrl: String
     
+    // Decodificar el campo 'image_url' en 'imageUrl'
     enum CodingKeys: String, CodingKey {
-            case city
-            case country
-            case description
-            case category
-            case imageURL = "image_url" //
-        }
+        case id, title, country, description, category
+        case imageUrl = "image_url"
+    }
+}
+
+// Estructura para la respuesta completa de los destinos
+struct DestinationsResponse: Decodable {
+    let destinations: [Destination]
+}
+struct LoginResponse: Decodable {
+    let message: String
+    let user: User
 }
 // Estructura para representar un usuario
 struct User: Identifiable, Decodable {
-    var id: String
-    var email: String
-    var firstName: String
-    var lastName: String
-    var token: String  // Token de autenticación si es necesario
-
-    enum CodingKeys: String, CodingKey {
-        case id
-        case email
-        case firstName = "first_name"
-        case lastName = "last_name"
-        case token
-    }
+    let id: Int
+    let nombre: String
+    let apellidos: String
+    let email: String
+    let password: String
 }
+
+enum CodingKeys: String, CodingKey {
+    case id
+    case email
+    case nombre = "nombre"
+    case apellidos = "apellidos"
+    case password
+}
+

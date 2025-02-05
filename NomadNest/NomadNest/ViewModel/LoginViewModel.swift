@@ -11,24 +11,23 @@ class LoginViewModel: ObservableObject {
     @Published var password = ""
     @Published var responseMessage = ""
     @Published var isLoggedIn = false
+    @Published var user: User? // Almacena el usuario autenticado
     
     func login() {
-        // Llamada al servicio de red para hacer el login
+        print("Intentando iniciar sesión con el correo: \(email) y la contraseña: \(password)")
+        
         NetworkService.shared.login(username: email, password: password) { result in
-            switch result {
-            case .success(let response):
-                if let message = response["message"] as? String {
-                    DispatchQueue.main.async {
-                        if message == "Login exitoso" {
-                            self.isLoggedIn = true
-                        } else {
-                            self.responseMessage = message
-                        }
-                    }
-                }
-            case .failure(let error):
-                DispatchQueue.main.async {
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let user):
+                    self.user = user
+                    self.isLoggedIn = true
+                    self.responseMessage = "Login exitoso. ¡Bienvenido \(user.nombre)!"
+                    print("Login exitoso para el usuario: \(user.nombre) \(user.apellidos)")
+                    
+                case .failure(let error):
                     self.responseMessage = "Error: \(error.localizedDescription)"
+                    print("Error al intentar iniciar sesión: \(error.localizedDescription)")
                 }
             }
         }
