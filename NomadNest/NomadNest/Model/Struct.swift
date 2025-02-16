@@ -56,3 +56,51 @@ enum CodingKeys: String, CodingKey {
     case password
 }
 
+// Estructuras para manejar la respuesta de Google Places API
+struct GooglePlacesResponse: Codable {
+    let results: [Place]
+}
+
+struct Place: Codable, Identifiable {
+    let id: String
+    let name: String
+    let vicinity: String?
+    let rating: Double?
+    let types: [String]?
+    let geometry: Geometry
+    var photos: [Photo]? // Añadido para almacenar imágenes
+
+    enum CodingKeys: String, CodingKey {
+        case id = "place_id"
+        case name, vicinity, rating, types, geometry, photos
+    }
+}
+struct Photo: Codable {
+    let photo_reference: String
+    let height: Int
+    let width: Int
+    let html_attributions: [String]?
+    
+    // Función para obtener la URL de la imagen a partir del `photo_reference`
+    func getImageURL(apiKey: String) -> String {
+        let baseURL = "https://maps.googleapis.com/maps/api/place/photo"
+        return "\(baseURL)?maxwidth=\(width)&maxheight=\(height)&photoreference=\(photo_reference)&key=\(apiKey)"
+    }
+}
+
+struct Geometry: Codable {
+    let location: Location
+}
+
+struct Location: Codable {
+    let lat: Double
+    let lng: Double
+}
+struct GeocodeResponse: Codable {
+    let results: [GeocodeResult]
+}
+
+struct GeocodeResult: Codable {
+    let geometry: Geometry
+}
+

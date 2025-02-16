@@ -44,11 +44,11 @@ struct DestinationCardView: View {
 
 #Preview {
     DestinationCardView(destination: Destination(
-           id: 1,
-           title: "Nueva Zelanda",
-           country: "Nueva Zelanda",
-           description: "Un paraíso para los aventureros con actividades como el bungee jumping, rafting y senderismo en paisajes de otro mundo",
-           category: "Aventura",
-           imageUrl: "https://images.app.goo.gl/MTUhzGMUYaobNai78"
-       ))
+            id: 1,
+            title: "Barcelona",
+            country: "España",
+            description: "Una ciudad vibrante con una arquitectura impresionante, playas y vida nocturna.",
+            category: "Cultural",
+            imageUrl: "https://example.com/barcelona.jpg"
+        ))
 }

@@ -5,8 +5,10 @@
 //  Created by Rocio Martos on 29/1/25.
 //
 import Foundation
+import CoreLocation
 class NetworkService {
     static let shared = NetworkService()
+    private let googlePlacesAPIKey = "AIzaSyCg3flfAqOsUTgpLhFbyQUW7cRPeXnEAlw"
     
     private init() {}
     
@@ -160,6 +162,142 @@ class NetworkService {
                     completion(.failure(NetworkError.decodingError))
                 }
             }
+        }.resume()
+    }
+    func fetchNearbyPlaces(type: String, location: CLLocationCoordinate2D, radius: Int = 1500, completion: @escaping (Result<[Place], Error>) -> Void) {
+        let baseURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
+        
+        // Parámetros de la solicitud
+        let parameters: [String: Any] = [
+            "location": "\(location.latitude),\(location.longitude)",
+            "radius": radius,
+            "type": type,
+            "key": googlePlacesAPIKey
+        ]
+        
+        // Construir la URL con los parámetros
+        var urlComponents = URLComponents(string: baseURL)
+        urlComponents?.queryItems = parameters.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
+        
+        guard let url = urlComponents?.url else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        // Realizar la solicitud
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.noData))
+                }
+                return
+            }
+            
+            do {
+                // Decodificar la respuesta
+                let placesResponse = try JSONDecoder().decode(GooglePlacesResponse.self, from: data)
+                
+                // Aquí podemos mapear las imágenes y agregar fotos a cada Place
+                let placesWithPhotos = placesResponse.results.map { (place) -> Place in// `place` es mutable ahora
+                    var placeWithPhotos = place
+                    placeWithPhotos.photos = placeWithPhotos.photos?.map { photo in
+                        return photo
+                    }
+                    return placeWithPhotos
+                }
+                
+                DispatchQueue.main.async {
+                    completion(.success(placesWithPhotos))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    print("Error al decodificar la respuesta de Google Places: \(error.localizedDescription)")
+                    completion(.failure(NetworkError.decodingError))
+                }
+            }
+        }.resume()
+    }
+    func fetchCoordinates(for city: String, completion: @escaping (Result<CLLocationCoordinate2D, Error>) -> Void) {
+        let baseURL = "https://maps.googleapis.com/maps/api/geocode/json"
+        let parameters: [String: Any] = [
+            "address": city,
+            "key": googlePlacesAPIKey
+        ]
+        
+        var urlComponents = URLComponents(string: baseURL)
+        urlComponents?.queryItems = parameters.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
+        
+        guard let url = urlComponents?.url else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.noData))
+                }
+                return
+            }
+            
+            do {
+                let response = try JSONDecoder().decode(GeocodeResponse.self, from: data)
+                if let location = response.results.first?.geometry.location {
+                    let coordinates = CLLocationCoordinate2D(latitude: location.lat, longitude: location.lng)
+                    DispatchQueue.main.async {
+                        completion(.success(coordinates))
+                    }
+                } else {
+                    DispatchQueue.main.async {
+                        completion(.failure(NetworkError.decodingError))
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.decodingError))
+                }
+            }
+        }.resume()
+    }
+    func fetchImageURL(for photoReference: String, completion: @escaping (Result<String, Error>) -> Void) {
+        let baseURL = "https://maps.googleapis.com/maps/api/place/photo"
+        
+        // Supongamos que las imágenes no deben ser mayores a 400px de ancho
+        let urlString = "\(baseURL)?photoreference=\(photoReference)&maxwidth=400&key=\(googlePlacesAPIKey)"
+        
+        guard let url = URL(string: urlString) else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        // Realizamos la solicitud para obtener la imagen
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            
+            guard let _ = data else {
+                completion(.failure(NetworkError.noData))
+                return
+            }
+            
+            // Si todo es exitoso, devolvemos la URL de la imagen
+            completion(.success(urlString))
         }.resume()
     }
 }
