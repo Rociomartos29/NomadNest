@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+// Estructura para representar un viaje
 struct Trip: Identifiable {
     var id = UUID()
     var destination: String
@@ -35,25 +35,28 @@ struct Destination: Decodable, Identifiable {
 struct DestinationsResponse: Decodable {
     let destinations: [Destination]
 }
+
+// Estructura para la respuesta del login
 struct LoginResponse: Decodable {
     let message: String
     let user: User
+    let token: String?
 }
+
 // Estructura para representar un usuario
 struct User: Identifiable, Decodable {
     let id: Int
     let nombre: String
     let apellidos: String
     let email: String
-    let password: String
-}
-
-enum CodingKeys: String, CodingKey {
-    case id
-    case email
-    case nombre = "nombre"
-    case apellidos = "apellidos"
-    case password
+    
+    // Decodificación de las claves en el JSON
+    enum CodingKeys: String, CodingKey {
+        case id
+        case nombre
+        case apellidos
+        case email
+    }
 }
 
 // Estructuras para manejar la respuesta de Google Places API
@@ -75,6 +78,7 @@ struct Place: Codable, Identifiable {
         case name, vicinity, rating, types, geometry, photos
     }
 }
+
 struct Photo: Codable {
     let photo_reference: String
     let height: Int
@@ -96,6 +100,7 @@ struct Location: Codable {
     let lat: Double
     let lng: Double
 }
+
 struct GeocodeResponse: Codable {
     let results: [GeocodeResult]
 }
@@ -103,4 +108,3 @@ struct GeocodeResponse: Codable {
 struct GeocodeResult: Codable {
     let geometry: Geometry
 }
-

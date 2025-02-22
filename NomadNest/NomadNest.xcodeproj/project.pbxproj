@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		367D00292D6A022200AF5324 /* KeychainSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 367D00282D6A022200AF5324 /* KeychainSwift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		363F10882D4A8B43002E87F4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -52,6 +56,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				367D00292D6A022200AF5324 /* KeychainSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +117,7 @@
 			);
 			name = NomadNest;
 			packageProductDependencies = (
+				367D00282D6A022200AF5324 /* KeychainSwift */,
 			);
 			productName = NomadNest;
 			productReference = 363F10772D4A8B41002E87F4 /* NomadNest.app */;
@@ -195,6 +201,9 @@
 			);
 			mainGroup = 363F106E2D4A8B41002E87F4;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				367D00272D6A022200AF5324 /* XCRemoteSwiftPackageReference "keychain-swift" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 363F10782D4A8B41002E87F4 /* Products */;
 			projectDirPath = "";
@@ -556,6 +565,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		367D00272D6A022200AF5324 /* XCRemoteSwiftPackageReference "keychain-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/evgenyneu/keychain-swift.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 24.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		367D00282D6A022200AF5324 /* KeychainSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 367D00272D6A022200AF5324 /* XCRemoteSwiftPackageReference "keychain-swift" */;
+			productName = KeychainSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 363F106F2D4A8B41002E87F4 /* Project object */;
 }

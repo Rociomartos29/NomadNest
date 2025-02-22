@@ -12,42 +12,52 @@ struct DestinationsDetailView: View {
     @StateObject private var viewModel = DestinationsDetailViewModel()
     
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                // Imagen principal del destino
-                AsyncImage(url: URL(string: destination.imageUrl)) { image in
-                    image.resizable().scaledToFill().frame(height: 250).clipped()
-                } placeholder: {
-                    Color.gray.frame(height: 250)
-                }
-                
-                Text(destination.title)
-                    .font(.largeTitle).bold().foregroundColor(Color(hex: "#f8be77"))
-                    .padding(.horizontal)
-                
-                Text(destination.description)
-                    .font(.body).foregroundColor(.white)
-                    .padding(.horizontal)
-                
-                // Mostrar el ProgressView mientras se carga
-                if viewModel.isLoading {
-                    ProgressView("Cargando recomendaciones...")
-                        .padding()
-                } else {
-                    // Secciones con los lugares recomendados (en formato horizontal)
-                    SectionView(title: "Hoteles recomendados", places: viewModel.hotels)
-                    SectionView(title: "Restaurantes recomendados", places: viewModel.restaurants)
-                    SectionView(title: "Actividades y excursiones", places: viewModel.activities)
-                }
-            }
-        }
-        .background(Color(hex: "#363c46"))
-        .edgesIgnoringSafeArea(.top)
-        .onAppear {
-            viewModel.fetchPlaces(for: destination)
-        }
-    }
-}
+          ScrollView {
+              VStack(alignment: .leading, spacing: 20) {
+                  // Imagen principal del destino con esquinas redondeadas
+                  AsyncImage(url: URL(string: destination.imageUrl)) { image in
+                      image.resizable()
+                          .scaledToFill()
+                          .frame(height: 250)
+                          .clipShape(RoundedRectangle(cornerRadius: 12)) // Bordes redondeados
+                          
+                  } placeholder: {
+                      Color.gray.frame(height: 250)
+                          .clipShape(RoundedRectangle(cornerRadius: 12))
+                  }
+                  
+                  // Nombre del destino
+                  Text(destination.title)
+                      .font(.largeTitle)
+                      .bold()
+                      .foregroundColor(Color(hex: "#f8be77"))
+                      .padding(.horizontal)
+                  
+                  // Descripción
+                  Text(destination.description)
+                      .font(.body)
+                      .foregroundColor(.black)
+                      .padding(.horizontal)
+                  
+                  // Mostrar ProgressView mientras carga
+                  if viewModel.isLoading {
+                      ProgressView("Cargando recomendaciones...")
+                          .padding()
+                  } else {
+                      // Secciones de recomendaciones
+                      SectionView(title: "🏨 Hoteles recomendados", places: viewModel.hotels)
+                      SectionView(title: "🍽 Restaurantes recomendados", places: viewModel.restaurants)
+                      SectionView(title: "🎢 Actividades y excursiones", places: viewModel.activities)
+                  }
+              }
+          }
+          .background(Color.white)
+          .edgesIgnoringSafeArea(.top)
+          .onAppear {
+              viewModel.fetchPlaces(for: destination)
+          }
+      }
+  }
 
 // Componente reutilizable para las secciones con scroll horizontal
 struct SectionView: View {

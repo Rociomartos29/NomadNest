@@ -49,12 +49,7 @@ struct BottomNavigationBar: View {
         .frame(maxWidth: .infinity)
         .padding(.vertical, 8) // Reducir la altura de la barra
         .background(Color.gray)
-        .cornerRadius(20)
-        .overlay(
-                    RoundedRectangle(cornerRadius: 20)  // Añadir borde con las mismas esquinas redondeadas
-                        .stroke(Color.white, lineWidth: 1)  // Borde blanco
-                )
-        
+        .cornerRadius(10)        
     }
 }
 
