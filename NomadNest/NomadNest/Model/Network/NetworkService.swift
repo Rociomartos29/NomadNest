@@ -11,7 +11,7 @@ import KeychainSwift
 class NetworkService {
     static let shared = NetworkService()
     private let googlePlacesAPIKey = "AIzaSyCg3flfAqOsUTgpLhFbyQUW7cRPeXnEAlw"
-    private let keychain = KeychainHelper()
+    private let keychain = KeychainSwift()
     private init() {}
     
     // Función de login
@@ -83,7 +83,7 @@ class NetworkService {
         // Función para verificar si el token existe (para comprobar si ya está logueado)
         func checkSession() -> Bool {
             // Verificamos si hay un token guardado en Keychain
-            if let token = keychain.get(forKey: "authToken"), !token.isEmpty {
+            if let token = keychain.get("authToken"), !token.isEmpty {
                 return true // Si hay token, se considera que la sesión está activa
             }
             return false // Si no hay token, la sesión no está activa
@@ -92,7 +92,7 @@ class NetworkService {
         // Función para hacer logout (eliminar el token de Keychain)
         func logout() {
             // Eliminamos el token de Keychain al cerrar sesión
-            keychain.delete(forKey: "authToken")
+            keychain.delete("authToken")
         }
     
    
