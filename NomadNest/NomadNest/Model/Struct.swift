@@ -71,11 +71,15 @@ struct Place: Codable, Identifiable {
     let rating: Double?
     let types: [String]?
     let geometry: Geometry
-    var photos: [Photo]? // Añadido para almacenar imágenes
-
+    var photos: [Photo]?
+    var price: Double? // Precio simulado
+    var availability: Bool // Disponibilidad simulada
+    var checkInDate: Date? // Fecha de check-in simulada
+    var checkOutDate: Date? // Fecha de check-out simulada
+    
     enum CodingKeys: String, CodingKey {
         case id = "place_id"
-        case name, vicinity, rating, types, geometry, photos
+        case name, vicinity, rating, types, geometry, photos, price,availability, checkInDate, checkOutDate
     }
 }
 
@@ -107,4 +111,44 @@ struct GeocodeResponse: Codable {
 
 struct GeocodeResult: Codable {
     let geometry: Geometry
+}
+struct AmadeusFlightResponse: Decodable {
+    let data: [Flight]
+}
+
+struct Flight: Codable {
+    let type: String
+    let id: String
+    let source: String
+    let destination: String
+    let departure: String
+    let arrival: String
+    let price: Price
+}
+
+struct Price: Codable {
+    let total: String
+    let currency: String
+}
+
+struct Itinerary: Decodable {
+    let segments: [Segment]
+}
+
+struct Segment: Decodable {
+    let departure: Departure
+    let arrival: Arrival
+}
+
+struct Departure: Decodable {
+    let airport: String
+    let dateTime: String
+}
+
+struct Arrival: Decodable {
+    let airport: String
+    let dateTime: String
+}
+struct FlightOffersResponse: Codable {
+    let data: [Flight]
 }

@@ -19,7 +19,7 @@ struct ExploreView: View {
                 // Fondo blanco en toda la pantalla
                 Color.white
                     .edgesIgnoringSafeArea(.all)
-                
+                    
                 // Contenido principal
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {

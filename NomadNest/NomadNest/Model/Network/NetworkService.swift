@@ -35,7 +35,7 @@ class NetworkService {
             completion(.failure(error))
             return
         }
-
+        
         print("Enviando solicitud de login a: \(url)")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
@@ -79,123 +79,123 @@ class NetworkService {
             }
         }.resume()
     }
-        
-        // Función para verificar si el token existe (para comprobar si ya está logueado)
-        func checkSession() -> Bool {
-            // Verificamos si hay un token guardado en Keychain
-            if let token = keychain.get("authToken"), !token.isEmpty {
-                return true // Si hay token, se considera que la sesión está activa
-            }
-            return false // Si no hay token, la sesión no está activa
-        }
-        
-        // Función para hacer logout (eliminar el token de Keychain)
-        func logout() {
-            // Eliminamos el token de Keychain al cerrar sesión
-            keychain.delete("authToken")
-        }
     
-   
-      // Función para registrar un nuevo usuario
-      func register(nombre: String, apellidos: String, email: String, password: String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
-          let urlString = "http://localhost:4000/register"
-          
-          guard let url = URL(string: urlString) else {
-              print("URL inválida para registro: \(urlString)")
-              completion(.failure(NetworkError.invalidURL))
-              return
-          }
-          
-          var request = URLRequest(url: url)
-          request.httpMethod = "POST"
-          request.addValue("application/json", forHTTPHeaderField: "Content-Type")
-          
-          let body: [String: Any] = [
-              "nombre": nombre,
-              "apellidos": apellidos,
-              "email": email,
-              "password": password
-          ]
-          
-          do {
-              request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
-              print("Cuerpo de la solicitud (registro): \(String(data: request.httpBody!, encoding: .utf8) ?? "")")
-          } catch {
-              print("Error al serializar el cuerpo del request (registro): \(error)")
-              completion(.failure(error))
-              return
-          }
-          
-          print("Enviando solicitud de registro a: \(urlString)")
-          
-          URLSession.shared.dataTask(with: request) { data, response, error in
-              if let error = error {
-                  print("Error al realizar la solicitud de registro: \(error.localizedDescription)")
-                  completion(.failure(error))
-                  return
-              }
-              
-              guard let data = data else {
-                  print("No se recibieron datos de la respuesta en el registro")
-                  completion(.failure(NetworkError.noData))
-                  return
-              }
-              
-              print("Datos recibidos de la respuesta en el registro: \(String(describing: String(data: data, encoding: .utf8)))")
-              
-              do {
-                  if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
-                      print("Respuesta recibida del registro: \(jsonResponse)")
-                      completion(.success(jsonResponse))
-                  } else {
-                      print("Error al decodificar la respuesta en el registro")
-                      completion(.failure(NetworkError.decodingError))
-                  }
-              } catch {
-                  print("Error al procesar los datos JSON en el registro: \(error.localizedDescription)")
-                  completion(.failure(NetworkError.decodingError))
-              }
-          }.resume()
-      }
-
-      // Función para obtener destinos
-      func fetchDestinations(completion: @escaping (Result<[Destination], Error>) -> Void) {
-          let url = URL(string: "http://localhost:4000/destinations")!
-          
-          var request = URLRequest(url: url)
-          request.httpMethod = "GET"
-          
-          URLSession.shared.dataTask(with: request) { data, response, error in
-              if let error = error {
-                  DispatchQueue.main.async {
-                      completion(.failure(error))
-                  }
-                  return
-              }
-              
-              guard let data = data else {
-                  DispatchQueue.main.async {
-                      completion(.failure(NetworkError.noData))
-                  }
-                  return
-              }
-              
-              print("Datos recibidos de la respuesta al obtener destinos: \(String(describing: String(data: data, encoding: .utf8)))")
-              
-              do {
-                  // Decodificar la respuesta como DestinationsResponse
-                  let destinationsResponse = try JSONDecoder().decode(DestinationsResponse.self, from: data)
-                  DispatchQueue.main.async {
-                      completion(.success(destinationsResponse.destinations))
-                  }
-              } catch {
-                  DispatchQueue.main.async {
-                      print("Error al decodificar los datos de los destinos: \(error.localizedDescription)")
-                      completion(.failure(NetworkError.decodingError))
-                  }
-              }
-          }.resume()
-      }
+    // Función para verificar si el token existe (para comprobar si ya está logueado)
+    func checkSession() -> Bool {
+        // Verificamos si hay un token guardado en Keychain
+        if let token = keychain.get("authToken"), !token.isEmpty {
+            return true // Si hay token, se considera que la sesión está activa
+        }
+        return false // Si no hay token, la sesión no está activa
+    }
+    
+    // Función para hacer logout (eliminar el token de Keychain)
+    func logout() {
+        // Eliminamos el token de Keychain al cerrar sesión
+        keychain.delete("authToken")
+    }
+    
+    
+    // Función para registrar un nuevo usuario
+    func register(nombre: String, apellidos: String, email: String, password: String, completion: @escaping (Result<[String: Any], Error>) -> Void) {
+        let urlString = "http://localhost:4000/register"
+        
+        guard let url = URL(string: urlString) else {
+            print("URL inválida para registro: \(urlString)")
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        
+        let body: [String: Any] = [
+            "nombre": nombre,
+            "apellidos": apellidos,
+            "email": email,
+            "password": password
+        ]
+        
+        do {
+            request.httpBody = try JSONSerialization.data(withJSONObject: body, options: [])
+            print("Cuerpo de la solicitud (registro): \(String(data: request.httpBody!, encoding: .utf8) ?? "")")
+        } catch {
+            print("Error al serializar el cuerpo del request (registro): \(error)")
+            completion(.failure(error))
+            return
+        }
+        
+        print("Enviando solicitud de registro a: \(urlString)")
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("Error al realizar la solicitud de registro: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
+            }
+            
+            guard let data = data else {
+                print("No se recibieron datos de la respuesta en el registro")
+                completion(.failure(NetworkError.noData))
+                return
+            }
+            
+            print("Datos recibidos de la respuesta en el registro: \(String(describing: String(data: data, encoding: .utf8)))")
+            
+            do {
+                if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] {
+                    print("Respuesta recibida del registro: \(jsonResponse)")
+                    completion(.success(jsonResponse))
+                } else {
+                    print("Error al decodificar la respuesta en el registro")
+                    completion(.failure(NetworkError.decodingError))
+                }
+            } catch {
+                print("Error al procesar los datos JSON en el registro: \(error.localizedDescription)")
+                completion(.failure(NetworkError.decodingError))
+            }
+        }.resume()
+    }
+    
+    // Función para obtener destinos
+    func fetchDestinations(completion: @escaping (Result<[Destination], Error>) -> Void) {
+        let url = URL(string: "http://localhost:4000/destinations")!
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.noData))
+                }
+                return
+            }
+            
+            print("Datos recibidos de la respuesta al obtener destinos: \(String(describing: String(data: data, encoding: .utf8)))")
+            
+            do {
+                // Decodificar la respuesta como DestinationsResponse
+                let destinationsResponse = try JSONDecoder().decode(DestinationsResponse.self, from: data)
+                DispatchQueue.main.async {
+                    completion(.success(destinationsResponse.destinations))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    print("Error al decodificar los datos de los destinos: \(error.localizedDescription)")
+                    completion(.failure(NetworkError.decodingError))
+                }
+            }
+        }.resume()
+    }
     func fetchNearbyPlaces(type: String, location: CLLocationCoordinate2D, radius: Int = 1500, completion: @escaping (Result<[Place], Error>) -> Void) {
         let baseURL = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
         
@@ -330,6 +330,115 @@ class NetworkService {
             
             // Si todo es exitoso, devolvemos la URL de la imagen
             completion(.success(urlString))
+        }.resume()
+    }
+    // Función para obtener el token de acceso de Amadeus
+    func getAmadeusAccessToken(completion: @escaping (String?, Error?) -> Void) {
+        let clientId = "ktxhCMAdbGNQ5hCDd5Igbcw8JMyDZIqh"
+        let clientSecret = "BTemZO0yFqeXnofz"
+        
+        let url = URL(string: "https://test.api.amadeus.com/v1/security/oauth2/token")!
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        
+        // Los parámetros del formulario
+        let parameters = [
+            "grant_type": "client_credentials",
+            "client_id": clientId,
+            "client_secret": clientSecret
+        ]
+        
+        // Codificar los parámetros
+        let bodyString = parameters.map { "\($0.key)=\($0.value)" }.joined(separator: "&")
+        request.httpBody = bodyString.data(using: .utf8)
+        
+        // Realizar la solicitud
+        URLSession.shared.dataTask(with: request) { data, response, error in
+            if let error = error {
+                completion(nil, error)
+                return
+            }
+            
+            guard let data = data else {
+                completion(nil, NSError(domain: "No data", code: 0, userInfo: nil))
+                return
+            }
+            
+            do {
+                // Decodificar el JSON para obtener el token
+                if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
+                   let accessToken = jsonResponse["access_token"] as? String {
+                    completion(accessToken, nil)
+                } else {
+                    completion(nil, NSError(domain: "Invalid Response", code: 0, userInfo: nil))
+                }
+            } catch {
+                completion(nil, error)
+            }
+        }.resume()
+    }
+    // Función para buscar vuelos con Amadeus
+    func fetchFlights(token: String, origin: String, destination: String, departureDate: String, returnDate: String, completion: @escaping (Result<FlightOffersResponse, Error>) -> Void) {
+        let urlString = "https://test.api.amadeus.com/v2/shopping/flight-offers"
+        
+        guard let url = URL(string: urlString) else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        
+        // Añadir el token de autorización en los encabezados
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        
+        // Parámetros de la consulta
+        let parameters: [String: Any] = [
+            "originLocationCode": origin,
+            "destinationLocationCode": destination,
+            "departureDate": departureDate,
+            "returnDate": returnDate,
+            "adults": 1
+        ]
+        
+        // Construir la URL con los parámetros
+        var urlComponents = URLComponents(string: urlString)
+        urlComponents?.queryItems = parameters.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
+        
+        guard let finalURL = urlComponents?.url else {
+            completion(.failure(NetworkError.invalidURL))
+            return
+        }
+        
+        // Realizar la solicitud
+        URLSession.shared.dataTask(with: finalURL) { data, response, error in
+            if let error = error {
+                DispatchQueue.main.async {
+                    completion(.failure(error))
+                }
+                return
+            }
+            
+            guard let data = data else {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.noData))
+                }
+                return
+            }
+            
+            do {
+                // Decodificar la respuesta en el formato adecuado
+                let flightResponse = try JSONDecoder().decode(FlightOffersResponse.self, from: data)
+                DispatchQueue.main.async {
+                    completion(.success(flightResponse))
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.decodingError))
+                }
+            }
         }.resume()
     }
 }

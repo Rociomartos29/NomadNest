@@ -13,21 +13,46 @@ struct RegisterView: View {
     var body: some View {
         NavigationView {
             VStack {
+                // Imagen más pequeña en la parte superior
+                Image("fondo1")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 350) // Reducimos la altura de la imagen
+                    .padding(.top, 50)
+                
+                Spacer()
                 // Campos de entrada
                 TextField("Nombre", text: $viewModel.nombre)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(hex: "#f8be77"), lineWidth: 1) // Borde de color #f8be77
+                    )
                     .padding()
+                
                 
                 TextField("Apellido", text: $viewModel.apellido)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(hex: "#f8be77"), lineWidth: 1) // Borde de color #f8be77
+                    )
                     .padding()
                 
                 TextField("Email", text: $viewModel.email)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(hex: "#f8be77"), lineWidth: 1) // Borde de color #f8be77
+                    )
                     .padding()
                 
                 SecureField("Contraseña", text: $viewModel.password)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(hex: "#f8be77"), lineWidth: 1) // Borde de color #f8be77
+                    )
                     .padding()
                 
                 // Botón de registro
@@ -40,7 +65,7 @@ struct RegisterView: View {
                     Text("Registrarse")
                         .frame(maxWidth: .infinity)
                         .padding()
-                        .background(Color.blue)
+                        .background(Color(hex: "#f8be77"))
                         .foregroundColor(.white)
                         .cornerRadius(10)
                 }
@@ -60,7 +85,6 @@ struct RegisterView: View {
                     EmptyView()
                 }
             }
-            .navigationTitle("Registro")
             .padding()
         }
     }

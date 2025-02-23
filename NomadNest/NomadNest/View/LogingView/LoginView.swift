@@ -21,8 +21,8 @@ struct LoginView: View {
                 Image("fondo1")
                     .resizable()
                     .scaledToFit()
-                    .frame(height: 150) // Reducimos la altura de la imagen
-                    .padding(.top, 40)
+                    .frame(height: 350) // Reducimos la altura de la imagen
+                    .padding(.top, 50)
                 
                 Spacer()
                 
