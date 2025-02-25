@@ -43,21 +43,33 @@ class FlightViewModel: ObservableObject {
     
     // Método para realizar la búsqueda de vuelos usando el token de acceso
     private func fetchFlights(token: String, origin: String, destination: String, departureDate: String, returnDate: String) {
-        // Llamada al servicio de red para obtener los vuelos
         NetworkService.shared.fetchFlights(token: token, origin: origin, destination: destination, departureDate: departureDate, returnDate: returnDate) { [weak self] result in
             guard let self = self else { return }
             
-            // Desactivar el indicador de carga
             self.isLoading = false
             
             switch result {
             case .success(let flightResponse):
-                // Guardar los vuelos recibidos
-                self.flights = flightResponse.data
-                self.errorMessage = nil
+                // Verificar que la respuesta contenga vuelos
+                if !flightResponse.data.isEmpty {
+                    self.flights = flightResponse.data
+                    self.errorMessage = nil
+                    
+                    // 🔹 Imprimir en consola para verificar los datos recibidos
+                    print("✅ Datos recibidos de la API:")
+                    for flight in self.flights {
+                        print("✈️ \(flight.source) -> \(flight.destination) | Precio: \(flight.price.total) \(flight.price.currency)")
+                    }
+                } else {
+                    self.errorMessage = "No se encontraron vuelos"
+                    print("❌ No se encontraron vuelos.")
+                }
+                
             case .failure(let error):
-                // Manejar el error
                 self.errorMessage = "Error al obtener los vuelos: \(error.localizedDescription)"
+                
+                // 🔹 Imprimir error en consola
+                print("❌ Error al obtener vuelos:", error.localizedDescription)
             }
         }
     }

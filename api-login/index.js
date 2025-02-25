@@ -127,6 +127,29 @@ app.get('/destinations', (req, res) => {
     res.json({ destinations: rows });
   });
 });
+app.get('/flights', (req, res) => {
+  const { origen, destino, fecha_salida, fecha_regreso } = req.query;
+
+  if (!origen || !destino || !fecha_salida || !fecha_regreso) {
+    return res.status(400).json({ message: 'Todos los parámetros son obligatorios' });
+  }
+
+  const query = `
+    SELECT * FROM vuelos 
+    WHERE origen = ? AND destino = ? 
+    AND fecha_salida >= ? AND fecha_regreso <= ?
+  `;
+
+  db.all(query, [origen, destino, fecha_salida, fecha_regreso], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ message: 'Error al obtener los vuelos', error: err.message });
+    }
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron vuelos' });
+    }
+    res.json({ flights: rows });
+  });
+});
 // Iniciar el servidor
 app.listen(port, () => {
 console.log(`Servidor escuchando en http://localhost:${port}`);

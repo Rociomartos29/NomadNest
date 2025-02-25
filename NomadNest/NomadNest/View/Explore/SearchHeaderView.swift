@@ -21,127 +21,113 @@ struct SearchHeaderView: View {
     @State private var children = 0
     
     @State private var selectedOption: TravelOption = .hotel
+    @State private var navigateToFlights = false  // Estado para navegar a FlightView
     
-    @State private var flights: [Flight] = [] // Aquí guardamos los vuelos que encontramos.
-    @State private var isLoadingFlights = false
+    // Variables para las ciudades de origen y destino
+    @State private var originQuery: String = ""
+    @State private var destinationQuery: String = ""
     
     enum TravelOption {
         case hotel, flight, hotelFlight
     }
     
     var body: some View {
-        VStack(spacing: 10) {
-            // Contenedor con fondo oscuro y esquinas redondeadas
+        NavigationView { // 📌 Agregar NavigationView para manejar la navegación
             VStack(spacing: 10) {
-                // Opciones de viaje dentro del mismo marco
-                HStack(spacing: 20) {
-                    travelOptionButton(icon: "bed.double.fill", option: .hotel)
-                    travelOptionButton(icon: "airplane", option: .flight)
-                    travelOptionButton(icon: "bed.double.fill", secondIcon: "airplane", option: .hotelFlight)
-                }
-                .padding(8)
-                .frame(maxWidth: .infinity)
-                .background(Color.white.opacity(0.2))
-                .cornerRadius(8)
-                
-                // Campo de búsqueda de destino
-                TextField("Buscar destino...", text: $searchQuery)
-                    .padding()
-                    .background(Color.white.opacity(0.8))
-                    .cornerRadius(8)
-                    .onTapGesture {
-                        self.isEditing = true
+                VStack(spacing: 10) {
+                    HStack(spacing: 20) {
+                        travelOptionButton(icon: "bed.double.fill", option: .hotel)
+                        travelOptionButton(icon: "airplane", option: .flight)
+                        travelOptionButton(icon: "bed.double.fill", secondIcon: "airplane", option: .hotelFlight)
                     }
-                    .overlay(
-                        HStack {
-                            Spacer()
-                            if isEditing {
-                                Button(action: {
-                                    self.searchQuery = ""
-                                }) {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundColor(.gray)
-                                }
-                                .padding(.trailing)
-                            }
-                        }
-                    )
-                    .font(.title3)
-                    .foregroundColor(.black)
-                    .keyboardType(.default)
-                
-                // Selección de Fechas
-                HStack {
-                    dateButton(title: "Inicio", date: $startDate, showPicker: $showStartDatePicker)
-                    dateButton(title: "Fin", date: $endDate, showPicker: $showEndDatePicker)
-                }
-                
-                // Selección de pasajeros
-                Button(action: {
-                    showPassengerPicker.toggle()
-                }) {
-                    HStack {
-                        Image(systemName: "person.3.fill")
-                            .foregroundColor(Color(hex: "#f8be77"))
-                        Text("Pasajeros: \(adults) Adultos, \(children) Niños")
-                            .foregroundColor(.white)
-                    }
-                    .padding()
+                    .padding(8)
                     .frame(maxWidth: .infinity)
                     .background(Color.white.opacity(0.2))
                     .cornerRadius(8)
-                }
-                
-                // Mostrar los vuelos solo si la opción seleccionada es de vuelo
-                if selectedOption == .flight {
-                    VStack {
-                        Text("Resultados de vuelos:")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                        
-                        // Mostrar los vuelos si están disponibles
-                        if isLoadingFlights {
-                            ProgressView("Cargando vuelos...")
-                                .progressViewStyle(CircularProgressViewStyle())
-                                .foregroundColor(.white)
-                        } else if flights.isEmpty {
-                            Text("No se han encontrado vuelos")
-                                .foregroundColor(.white)
-                        } else {
-                            ForEach(flights, id: \.id) { flight in
-                                VStack(alignment: .leading) {
-                                    Text("\(flight.source) -> \(flight.destination)")
-                                        .font(.subheadline)
-                                        .foregroundColor(.white)
-                                    Text("Precio: \(flight.price.total) \(flight.price.currency)")
-                                        .font(.subheadline)
-                                        .foregroundColor(.white)
-                                }
-                                .padding(.bottom, 5)
-                            }
+                    
+                    // Caja de búsqueda para destino
+                    TextField("Buscar destino...", text: $searchQuery)
+                        .padding()
+                        .background(Color.white.opacity(0.8))
+                        .cornerRadius(8)
+                        .onTapGesture {
+                            self.isEditing = true
                         }
+                        .font(.title3)
+                        .foregroundColor(.black)
+                        .keyboardType(.default)
+                    
+                    // Si el tipo de búsqueda es vuelo o vuelo + hotel, mostramos la caja de búsqueda de origen
+                    if selectedOption == .flight || selectedOption == .hotelFlight {
+                        TextField("Buscar origen...", text: $originQuery)
+                            .padding()
+                            .background(Color.white.opacity(0.8))
+                            .cornerRadius(8)
+                            .onTapGesture {
+                                self.isEditing = true
+                            }
+                            .font(.title3)
+                            .foregroundColor(.black)
+                            .keyboardType(.default)
                     }
-                    .padding()
-                    .onAppear {
-                        // Buscar vuelos solo si es la opción seleccionada
-                        searchFlights()
+                    
+                    HStack {
+                        dateButton(title: "Inicio", date: $startDate, showPicker: $showStartDatePicker)
+                        dateButton(title: "Fin", date: $endDate, showPicker: $showEndDatePicker)
+                    }
+                    
+                    Button(action: {
+                        showPassengerPicker.toggle()
+                    }) {
+                        HStack {
+                            Image(systemName: "person.3.fill")
+                                .foregroundColor(Color(hex: "#f8be77"))
+                            Text("Pasajeros: \(adults) Adultos, \(children) Niños")
+                                .foregroundColor(.white)
+                        }
+                        .padding()
+                        .frame(maxWidth: .infinity)
+                        .background(Color.white.opacity(0.2))
+                        .cornerRadius(8)
+                    }
+                    
+                    // 📌 Botón de búsqueda con NavigationLink
+                    NavigationLink(
+                        destination: FlightView(
+                            origin: originQuery.isEmpty ? searchQuery : originQuery, // Usa la ciudad de origen ingresada
+                            destination: searchQuery, // Usa la ciudad de destino ingresada
+                            departureDate: formattedDate(startDate),
+                            returnDate: formattedDate(endDate)
+                        ),
+                        isActive: $navigateToFlights
+                    ) {
+                        EmptyView()
+                    }
+                    
+                    Button(action: {
+                        if selectedOption == .flight || selectedOption == .hotelFlight {
+                            navigateToFlights = true // Activa la navegación
+                        }
+                    }) {
+                        Text("Buscar")
+                            .foregroundColor(.white)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.blue)
+                            .cornerRadius(8)
                     }
                 }
-                
+                .padding()
+                .background(Color(hex: "#363c46").opacity(0.9))
+                .cornerRadius(12)
+                .padding(.horizontal)
             }
-            .padding()
-            .background(Color(hex: "#363c46").opacity(0.9))
-            .cornerRadius(12)
-            .padding(.horizontal)
         }
     }
     
     private func travelOptionButton(icon: String, secondIcon: String? = nil, option: TravelOption) -> some View {
         Button(action: {
             selectedOption = option
-            if option == .flight {
-                searchFlights() // Llamamos a la búsqueda de vuelos cuando se selecciona la opción de vuelos
-            }
         }) {
             HStack {
                 Image(systemName: icon)
@@ -171,33 +157,12 @@ struct SearchHeaderView: View {
             .background(Color.white.opacity(0.2))
             .cornerRadius(8)
         }
-        .sheet(isPresented: showPicker) {
-            DatePicker("Selecciona una fecha", selection: date, displayedComponents: .date)
-                .datePickerStyle(GraphicalDatePickerStyle())
-                .padding()
-        }
     }
     
     private func formattedDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         return formatter.string(from: date)
-    }
-    
-    private func searchFlights() {
-        isLoadingFlights = true
-        // Aquí puedes colocar la lógica para buscar vuelos usando los parámetros de búsqueda
-        // Simulación de búsqueda de vuelos, reemplázalo con tu implementación real:
-        
-        let dispatchWorkItem = DispatchWorkItem {
-                flights = [
-                    Flight(type: "Economy", id: "1", source: "Madrid", destination: "Barcelona", departure: "2025-03-01T10:00", arrival: "2025-03-01T11:30", price: Price(total: "100", currency: "EUR")),
-                    Flight(type: "Economy", id: "2", source: "Madrid", destination: "Valencia", departure: "2025-03-02T14:00", arrival: "2025-03-02T15:30", price: Price(total: "120", currency: "EUR"))
-                ]
-                isLoadingFlights = false
-            }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2, execute: dispatchWorkItem)
     }
 }
 #Preview {

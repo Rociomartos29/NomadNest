@@ -333,6 +333,7 @@ class NetworkService {
         }.resume()
     }
     // Función para obtener el token de acceso de Amadeus
+    // Función para obtener el token de acceso de Amadeus
     func getAmadeusAccessToken(completion: @escaping (String?, Error?) -> Void) {
         let clientId = "ktxhCMAdbGNQ5hCDd5Igbcw8JMyDZIqh"
         let clientSecret = "BTemZO0yFqeXnofz"
@@ -379,6 +380,7 @@ class NetworkService {
             }
         }.resume()
     }
+    
     // Función para buscar vuelos con Amadeus
     func fetchFlights(token: String, origin: String, destination: String, departureDate: String, returnDate: String, completion: @escaping (Result<FlightOffersResponse, Error>) -> Void) {
         let urlString = "https://test.api.amadeus.com/v2/shopping/flight-offers"
@@ -411,6 +413,8 @@ class NetworkService {
             completion(.failure(NetworkError.invalidURL))
             return
         }
+        
+        print("🔹 URL de búsqueda de vuelos: \(finalURL)") // Depuración
         
         // Realizar la solicitud
         URLSession.shared.dataTask(with: finalURL) { data, response, error in
