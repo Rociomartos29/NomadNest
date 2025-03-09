@@ -12,6 +12,7 @@ struct ExploreView: View {
     @StateObject private var viewModel = SuggestionViewModel()
     @State private var userName: String = "Viajero" // Nombre por defecto
     @State private var searchQuery = ""  // Almacena la ciudad buscada
+    @State private var selectedOption: SearchHeaderView.TravelOption = .hotel
     
     var body: some View {
         NavigationView {
@@ -19,7 +20,7 @@ struct ExploreView: View {
                 // Fondo blanco en toda la pantalla
                 Color.white
                     .edgesIgnoringSafeArea(.all)
-                    
+                
                 // Contenido principal
                 ScrollView {
                     VStack(alignment: .leading, spacing: 20) {
@@ -31,8 +32,10 @@ struct ExploreView: View {
                             .padding(.top)
                             .frame(maxWidth: .infinity, alignment: .center)
                         
-                        // Encabezado de búsqueda
+                        // Encabezado de búsqueda, pasamos la opción seleccionada
+                        // Añadimos padding a los lados de SearchHeaderView
                         SearchHeaderView(searchQuery: $searchQuery)
+                            .padding(.horizontal) // Esto crea un espacio en ambos laterales del SearchHeaderView
                         
                         // "Lo más destacado" y mostrar destinos
                         Text("Lo más destacado")
@@ -42,14 +45,10 @@ struct ExploreView: View {
                             .padding(.top)
                             .padding(.leading)
                         
-                        // Filtrar destinos por nombre de ciudad (si se ha introducido una búsqueda)
-                        let filteredDestinations = searchQuery.isEmpty ? viewModel.destinations : viewModel.destinations.filter {
-                            $0.title.lowercased().contains(searchQuery.lowercased())
-                        }
-                        
-                        // Mostrar categorías si hay destinos
-                        if !filteredDestinations.isEmpty {
-                            ForEach(getUniqueCategories(from: filteredDestinations), id: \.self) { category in
+                        // Mostrar destinos sin filtrado
+                        // Aquí mantenemos la lista de destinos igual, sin que cambie al escribir
+                        if !viewModel.destinations.isEmpty {
+                            ForEach(getUniqueCategories(from: viewModel.destinations), id: \.self) { category in
                                 VStack(alignment: .leading, spacing: 10) {
                                     Text(category)
                                         .font(.title2)
@@ -60,7 +59,7 @@ struct ExploreView: View {
                                     // Lista horizontal de destinos por categoría
                                     ScrollView(.horizontal, showsIndicators: false) {
                                         LazyHStack(spacing: 16) {
-                                            ForEach(filteredDestinations.filter { $0.category == category }) { destination in
+                                            ForEach(viewModel.destinations.filter { $0.category == category }) { destination in
                                                 NavigationLink(destination: DestinationsDetailView(destination: destination)) {
                                                     DestinationCardView(destination: destination)
                                                 }
@@ -118,10 +117,7 @@ struct ExploreView: View {
         }
     }
 }
-
 #Preview {
     ExploreView()
         .environmentObject(SuggestionViewModel.mockedInstance())
 }
-
-

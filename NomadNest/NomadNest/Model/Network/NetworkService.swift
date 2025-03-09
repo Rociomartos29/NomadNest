@@ -10,7 +10,7 @@ import KeychainSwift
 
 class NetworkService {
     static let shared = NetworkService()
-    private let googlePlacesAPIKey = "AIzaSyCg3flfAqOsUTgpLhFbyQUW7cRPeXnEAlw"
+    static let googlePlacesAPIKey = "AIzaSyCg3flfAqOsUTgpLhFbyQUW7cRPeXnEAlw"
     private let keychain = KeychainSwift()
     private init() {}
     
@@ -204,7 +204,7 @@ class NetworkService {
             "location": "\(location.latitude),\(location.longitude)",
             "radius": radius,
             "type": type,
-            "key": googlePlacesAPIKey
+            "key": NetworkService.googlePlacesAPIKey
         ]
         
         // Construir la URL con los parámetros
@@ -212,35 +212,66 @@ class NetworkService {
         urlComponents?.queryItems = parameters.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
         
         guard let url = urlComponents?.url else {
+            print("Error: URL no válida.")
             completion(.failure(NetworkError.invalidURL))
             return
         }
         
+        print("Solicitando lugares cercanos con URL: \(url.absoluteString)")
+        
         // Realizar la solicitud
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
+                print("Error de red: \(error.localizedDescription)")
                 DispatchQueue.main.async {
                     completion(.failure(error))
                 }
                 return
             }
             
+            // Verificar el código de estado HTTP
+            if let httpResponse = response as? HTTPURLResponse {
+                print("Código de estado HTTP: \(httpResponse.statusCode)")
+                if httpResponse.statusCode != 200 {
+                    DispatchQueue.main.async {
+                        completion(.failure(NetworkError.httpError))
+                    }
+                    return
+                }
+            }
+            
             guard let data = data else {
+                print("Error: No se recibieron datos.")
                 DispatchQueue.main.async {
                     completion(.failure(NetworkError.noData))
                 }
                 return
             }
             
+            // Imprimir la respuesta JSON para depuración
+            if let jsonString = String(data: data, encoding: .utf8) {
+                print("Respuesta de la API: \(jsonString)")
+            }
+            
             do {
                 // Decodificar la respuesta
                 let placesResponse = try JSONDecoder().decode(GooglePlacesResponse.self, from: data)
+                print("Respuesta decodificada con éxito.")
                 
-                // Aquí podemos mapear las imágenes y agregar fotos a cada Place
-                let placesWithPhotos = placesResponse.results.map { (place) -> Place in// `place` es mutable ahora
+                // Verificar si los resultados están vacíos
+                if placesResponse.results.isEmpty {
+                    print("No se encontraron lugares cercanos.")
+                    DispatchQueue.main.async {
+                        completion(.failure(NetworkError.noResults))
+                    }
+                    return
+                }
+                
+                // Mapeamos las imágenes y agregamos fotos a cada lugar
+                let placesWithPhotos = placesResponse.results.map { (place) -> Place in
                     var placeWithPhotos = place
-                    placeWithPhotos.photos = placeWithPhotos.photos?.map { photo in
-                        return photo
+                    if let photos = placeWithPhotos.photos, !photos.isEmpty {
+                        placeWithPhotos.photos = photos
                     }
                     return placeWithPhotos
                 }
@@ -249,18 +280,19 @@ class NetworkService {
                     completion(.success(placesWithPhotos))
                 }
             } catch {
+                print("Error al decodificar la respuesta de Google Places: \(error.localizedDescription)")
                 DispatchQueue.main.async {
-                    print("Error al decodificar la respuesta de Google Places: \(error.localizedDescription)")
                     completion(.failure(NetworkError.decodingError))
                 }
             }
         }.resume()
     }
     func fetchCoordinates(for city: String, completion: @escaping (Result<CLLocationCoordinate2D, Error>) -> Void) {
+        
         let baseURL = "https://maps.googleapis.com/maps/api/geocode/json"
         let parameters: [String: Any] = [
             "address": city,
-            "key": googlePlacesAPIKey
+            "key": NetworkService.googlePlacesAPIKey
         ]
         
         var urlComponents = URLComponents(string: baseURL)
@@ -270,11 +302,18 @@ class NetworkService {
             completion(.failure(NetworkError.invalidURL))
             return
         }
+        print("URL generada: \(url)")
         
         URLSession.shared.dataTask(with: url) { data, response, error in
             if let error = error {
                 DispatchQueue.main.async {
                     completion(.failure(error))
+                }
+                return
+            }
+            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+                DispatchQueue.main.async {
+                    completion(.failure(NetworkError.invalidResponse(httpResponse.statusCode)))
                 }
                 return
             }
@@ -309,7 +348,7 @@ class NetworkService {
         let baseURL = "https://maps.googleapis.com/maps/api/place/photo"
         
         // Supongamos que las imágenes no deben ser mayores a 400px de ancho
-        let urlString = "\(baseURL)?photoreference=\(photoReference)&maxwidth=400&key=\(googlePlacesAPIKey)"
+        let urlString = "\(baseURL)?photoreference=\(photoReference)&maxwidth=400&key=\(NetworkService.googlePlacesAPIKey)"
         
         guard let url = URL(string: urlString) else {
             completion(.failure(NetworkError.invalidURL))
@@ -332,7 +371,6 @@ class NetworkService {
             completion(.success(urlString))
         }.resume()
     }
-    // Función para obtener el token de acceso de Amadeus
     // Función para obtener el token de acceso de Amadeus
     func getAmadeusAccessToken(completion: @escaping (String?, Error?) -> Void) {
         let clientId = "ktxhCMAdbGNQ5hCDd5Igbcw8JMyDZIqh"
@@ -452,4 +490,8 @@ enum NetworkError: Error {
     case decodingError
     case noToken
     case keychainError
+    case httpError
+    case noResults
+    case invalidResponse(Int)
 }
+

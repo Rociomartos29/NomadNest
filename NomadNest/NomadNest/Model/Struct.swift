@@ -62,24 +62,22 @@ struct User: Identifiable, Decodable {
 // Estructuras para manejar la respuesta de Google Places API
 struct GooglePlacesResponse: Codable {
     let results: [Place]
+    let status: String
 }
 
 struct Place: Codable, Identifiable {
-    let id: String
+    let id: String // "place_id" en la respuesta JSON
     let name: String
-    let vicinity: String?
-    let rating: Double?
-    let types: [String]?
+    let vicinity: String? // Este campo puede ser opcional
+    let rating: Double? // La calificación, opcional si no se proporciona
+    let types: [String]? // Los tipos del lugar, opcional si no se proporciona
     let geometry: Geometry
-    var photos: [Photo]?
-    var price: Double? // Precio simulado
-    var availability: Bool // Disponibilidad simulada
-    var checkInDate: Date? // Fecha de check-in simulada
-    var checkOutDate: Date? // Fecha de check-out simulada
-    
+    var photos: [Photo]? // Fotos relacionadas con el lugar, opcional
+    var pricePerNight: Double? // Precio por noche (opcional)
+
     enum CodingKeys: String, CodingKey {
         case id = "place_id"
-        case name, vicinity, rating, types, geometry, photos, price,availability, checkInDate, checkOutDate
+        case name, vicinity, rating, types, geometry, photos
     }
 }
 
@@ -88,14 +86,13 @@ struct Photo: Codable {
     let height: Int
     let width: Int
     let html_attributions: [String]?
-    
-    // Función para obtener la URL de la imagen a partir del `photo_reference`
+
+    // Función para obtener la URL de la imagen usando la API de Google Maps
     func getImageURL(apiKey: String) -> String {
         let baseURL = "https://maps.googleapis.com/maps/api/place/photo"
         return "\(baseURL)?maxwidth=\(width)&maxheight=\(height)&photoreference=\(photo_reference)&key=\(apiKey)"
     }
 }
-
 struct Geometry: Codable {
     let location: Location
 }
