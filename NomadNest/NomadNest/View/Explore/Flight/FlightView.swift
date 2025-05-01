@@ -32,14 +32,20 @@ struct FlightView: View {
                 Text("No se encontraron vuelos")
                     .foregroundColor(.white)
             } else {
-                List(flightViewModel.flights, id: \..id) { flight in
-                    VStack(alignment: .leading) {
-                        Text("✈️ \(flight.source) -> \(flight.destination)")
-                            .font(.headline)
-                        Text("Precio: \(flight.price.total) \(flight.price.currency)")
-                            .font(.subheadline)
+                List {
+                    ForEach(flightViewModel.flights) { flight in
+                        VStack(alignment: .leading) {
+                            Text("✈️ \(flight.origin) -> \(flight.destination)")
+                                .font(.headline)
+                            Text("Salida: \(flight.departureDate) | Regreso: \(flight.returnDate)")
+                                .font(.subheadline)
+                                .foregroundColor(.gray)
+                            Text(String(format: "Precio: %.2f €", flight.price))
+                                .font(.subheadline)
+                        }
                     }
                 }
+                .listStyle(PlainListStyle())
             }
         }
         .onAppear {
@@ -53,5 +59,5 @@ struct FlightView: View {
 }
 
 #Preview {
-    FlightView(origin: "MAD", destination: "BCN", departureDate: "2025-03-01", returnDate: "2025-03-05")
+    FlightView(origin: "Madrid", destination: "Barcelona", departureDate: "2025-05-01", returnDate: "2025-05-05")
 }

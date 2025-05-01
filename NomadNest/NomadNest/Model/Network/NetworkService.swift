@@ -366,115 +366,41 @@ class NetworkService {
             completion(.success(urlString))
         }.resume()
     }
-    // Función para obtener el token de acceso de Amadeus
-    func getAmadeusAccessToken(completion: @escaping (String?, Error?) -> Void) {
-        let clientId = "ktxhCMAdbGNQ5hCDd5Igbcw8JMyDZIqh"
-        let clientSecret = "BTemZO0yFqeXnofz"
+    func fetchFlights(origin: String, destination: String, departureDate: String, returnDate: String, completion: @escaping (Result<[Flight], Error>) -> Void) {
+        let urlString = "http://localhost:4000/flights"
         
-        let url = URL(string: "https://test.api.amadeus.com/v1/security/oauth2/token")!
-        
-        var request = URLRequest(url: url)
-        request.httpMethod = "POST"
-        request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        
-        // Los parámetros del formulario
-        let parameters = [
-            "grant_type": "client_credentials",
-            "client_id": clientId,
-            "client_secret": clientSecret
+        var urlComponents = URLComponents(string: urlString)!
+        urlComponents.queryItems = [
+            URLQueryItem(name: "origen", value: origin),
+            URLQueryItem(name: "destino", value: destination),
+            URLQueryItem(name: "fecha_salida", value: departureDate),
+            URLQueryItem(name: "fecha_regreso", value: returnDate)
         ]
         
-        // Codificar los parámetros
-        let bodyString = parameters.map { "\($0.key)=\($0.value)" }.joined(separator: "&")
-        request.httpBody = bodyString.data(using: .utf8)
-        
-        // Realizar la solicitud
-        URLSession.shared.dataTask(with: request) { data, response, error in
-            if let error = error {
-                completion(nil, error)
-                return
-            }
-            
-            guard let data = data else {
-                completion(nil, NSError(domain: "No data", code: 0, userInfo: nil))
-                return
-            }
-            
-            do {
-                // Decodificar el JSON para obtener el token
-                if let jsonResponse = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any],
-                   let accessToken = jsonResponse["access_token"] as? String {
-                    completion(accessToken, nil)
-                } else {
-                    completion(nil, NSError(domain: "Invalid Response", code: 0, userInfo: nil))
-                }
-            } catch {
-                completion(nil, error)
-            }
-        }.resume()
-    }
-    
-    // Función para buscar vuelos con Amadeus
-    func fetchFlights(token: String, origin: String, destination: String, departureDate: String, returnDate: String, completion: @escaping (Result<FlightOffersResponse, Error>) -> Void) {
-        let urlString = "https://test.api.amadeus.com/v2/shopping/flight-offers"
-        
-        guard let url = URL(string: urlString) else {
+        guard let finalURL = urlComponents.url else {
             completion(.failure(NetworkError.invalidURL))
             return
         }
         
-        var request = URLRequest(url: url)
+        var request = URLRequest(url: finalURL)
         request.httpMethod = "GET"
         
-        // Añadir el token de autorización en los encabezados
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        
-        // Parámetros de la consulta
-        let parameters: [String: Any] = [
-            "originLocationCode": origin,
-            "destinationLocationCode": destination,
-            "departureDate": departureDate,
-            "returnDate": returnDate,
-            "adults": 1
-        ]
-        
-        // Construir la URL con los parámetros
-        var urlComponents = URLComponents(string: urlString)
-        urlComponents?.queryItems = parameters.map { URLQueryItem(name: $0.key, value: "\($0.value)") }
-        
-        guard let finalURL = urlComponents?.url else {
-            completion(.failure(NetworkError.invalidURL))
-            return
-        }
-        
-        print("🔹 URL de búsqueda de vuelos: \(finalURL)") // Depuración
-        
-        // Realizar la solicitud
-        URLSession.shared.dataTask(with: finalURL) { data, response, error in
+        URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {
-                DispatchQueue.main.async {
-                    completion(.failure(error))
-                }
+                completion(.failure(error))
                 return
             }
             
             guard let data = data else {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.noData))
-                }
+                completion(.failure(NetworkError.noData))
                 return
             }
             
             do {
-                // Decodificar la respuesta en el formato adecuado
-                let flightResponse = try JSONDecoder().decode(FlightOffersResponse.self, from: data)
-                DispatchQueue.main.async {
-                    completion(.success(flightResponse))
-                }
+                let flightResponse = try JSONDecoder().decode(FlightsResponse.self, from: data)
+                completion(.success(flightResponse.flights))
             } catch {
-                DispatchQueue.main.async {
-                    completion(.failure(NetworkError.decodingError))
-                }
+                completion(.failure(NetworkError.decodingError))
             }
         }.resume()
     }

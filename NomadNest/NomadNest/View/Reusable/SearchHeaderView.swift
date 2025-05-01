@@ -117,6 +117,36 @@ struct SearchHeaderView: View {
                     .background(Color.white.opacity(0.2))
                     .cornerRadius(8)
                 }
+                .sheet(isPresented: $showPassengerPicker) {
+                    VStack {
+                        Text("Selecciona los pasajeros")
+                            .font(.headline)
+                            .padding()
+                        
+                        HStack {
+                            Text("Adultos: \(adults)")
+                            Stepper("", value: $adults, in: 1...10)
+                                .labelsHidden()
+                        }
+                        .padding()
+                        
+                        HStack {
+                            Text("Niños: \(children)")
+                            Stepper("", value: $children, in: 0...10)
+                                .labelsHidden()
+                        }
+                        .padding()
+                        
+                        Button("Aceptar") {
+                            showPassengerPicker = false
+                        }
+                        .padding()
+                        .background(Color.blue)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
+                    }
+                    .padding()
+                }
                 
                 // Botón de búsqueda que navega a la vista de HotelList
                 NavigationLink(destination: HotelListView(startDate: startDate, endDate: endDate, destination: searchQuery), isActive: $navigateToHotelList) {

@@ -3,7 +3,7 @@ const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
 const cors = require('cors'); 
 const jwt = require('jsonwebtoken'); // Importa el paquete jsonwebtoken
-
+const axios = require('axios');
 const app = express();
 const port = 4000;
 
@@ -130,17 +130,16 @@ app.get('/destinations', (req, res) => {
 app.get('/flights', (req, res) => {
   const { origen, destino, fecha_salida, fecha_regreso } = req.query;
 
-  if (!origen || !destino || !fecha_salida || !fecha_regreso) {
-    return res.status(400).json({ message: 'Todos los parámetros son obligatorios' });
+  // Si no se pasan parámetros, devolvemos todos los vuelos
+  let query = 'SELECT * FROM vuelos';
+  let params = [];
+
+  if (origen && destino && fecha_salida && fecha_regreso) {
+    query += ' WHERE origen = ? AND destino = ? AND fecha_salida >= ? AND fecha_regreso <= ?';
+    params = [origen, destino, fecha_salida, fecha_regreso];
   }
 
-  const query = `
-    SELECT * FROM vuelos 
-    WHERE origen = ? AND destino = ? 
-    AND fecha_salida >= ? AND fecha_regreso <= ?
-  `;
-
-  db.all(query, [origen, destino, fecha_salida, fecha_regreso], (err, rows) => {
+  db.all(query, params, (err, rows) => {
     if (err) {
       return res.status(500).json({ message: 'Error al obtener los vuelos', error: err.message });
     }
@@ -150,6 +149,21 @@ app.get('/flights', (req, res) => {
     res.json({ flights: rows });
   });
 });
+axios.get('http://localhost:4000/destinations')  // Cambia la URL si es necesario
+  .then(response => {
+    // Aquí obtenemos la respuesta de la API
+    const destinations = response.data.destinations;
+
+    // Mapear los destinos para obtener solo los nombres
+    const destinationNames = destinations.map(destination => destination.title);
+
+    // Mostrar los nombres en la consola
+    console.log('Nombres de los destinos:');
+    console.log(destinationNames);
+  })
+  .catch(error => {
+    console.error('Error al obtener destinos:', error.message);
+  });
 // Iniciar el servidor
 app.listen(port, () => {
 console.log(`Servidor escuchando en http://localhost:${port}`);

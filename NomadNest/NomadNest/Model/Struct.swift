@@ -109,22 +109,31 @@ struct GeocodeResponse: Codable {
 struct GeocodeResult: Codable {
     let geometry: Geometry
 }
-struct AmadeusFlightResponse: Decodable {
-    let data: [Flight]
+struct FlightsResponse: Decodable {
+    let flights: [Flight]
 }
 
-struct Flight: Codable {
-    let type: String
-    let id: String
-    let source: String
+struct Flight: Identifiable, Decodable {
+    let id: Int
+    let origin: String
     let destination: String
-    let departure: String
-    let arrival: String
-    let price: Price
+    let departureDate: String
+    let returnDate: String
+    let price: Double
+
+    // Claves personalizadas para mapear del JSON
+    private enum CodingKeys: String, CodingKey {
+        case id
+        case origin = "origen"
+        case destination = "destino"
+        case departureDate = "fecha_salida"
+        case returnDate = "fecha_regreso"
+        case price = "precio"
+    }
 }
 
-struct Price: Codable {
-    let total: String
+struct Price: Decodable {
+    let total: Double
     let currency: String
 }
 
@@ -146,13 +155,17 @@ struct Arrival: Decodable {
     let airport: String
     let dateTime: String
 }
-struct FlightOffersResponse: Codable {
-    let data: [Flight]
-}
+
 struct Reservation: Identifiable, Codable {
     let id = UUID()
     let hotelName: String
     let startDate: Date
     let endDate: Date
     let totalPrice: Double
+}
+struct RoomType: Identifiable, Hashable {
+    let id = UUID()
+    let name: String
+    let description: String
+    let priceMultiplier: Double
 }
