@@ -12,11 +12,15 @@ struct HotelListView: View {
     var endDate: Date
     var destination: String
     
-    @StateObject private var viewModel = HotelListViewModel()  // Instancia del ViewModel
+    @StateObject private var viewModel = HotelListViewModel()
+    @State private var selectedHotel: Place? = nil
+    @State private var showReservationSheet = false
     
-    // Variables @State para rastrear las selecciones del usuario
-    @State private var numberOfNights: Int = 1
-    @State private var numberOfPeople: Int = 1
+    private var numberOfNights: Int {
+        let calendar = Calendar.current
+        let difference = calendar.dateComponents([.day], from: startDate, to: endDate)
+        return difference.day ?? 1
+    }
     
     var body: some View {
         VStack {
@@ -47,13 +51,18 @@ struct HotelListView: View {
                     ScrollView {
                         LazyVStack(spacing: 15) {
                             ForEach(viewModel.hotels, id: \.id) { hotel in
-                                HotelRowView(
-                                    viewModel: viewModel,
-                                    hotel: hotel,
-                                    numberOfNights: numberOfNights,  // Pasamos el número de noches
-                                    numberOfPeople: numberOfPeople   // Pasamos el número de personas
-                                )
-                                .padding(.horizontal)
+                                Button {
+                                    selectedHotel = hotel
+                                    showReservationSheet = true
+                                } label: {
+                                    HotelRowView(
+                                        viewModel: viewModel,
+                                        hotel: hotel,
+                                        numberOfNights: numberOfNights
+                                    )
+                                    .padding(.horizontal, 16)
+                                }
+                                .buttonStyle(PlainButtonStyle())
                             }
                         }
                     }
@@ -62,8 +71,16 @@ struct HotelListView: View {
         }
         .navigationTitle("Hoteles")
         .onAppear {
-            // Cargar los hoteles cuando la vista aparezca
             viewModel.loadHotels(for: destination)
+        }
+        .sheet(isPresented: $showReservationSheet) {
+            if let hotel = selectedHotel {
+                HotelReservationSheetView(
+                    hotel: hotel,
+                    startDate: startDate,
+                    endDate: endDate
+                )
+            }
         }
     }
 }

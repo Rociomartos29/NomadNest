@@ -11,28 +11,27 @@ struct HotelRowView: View {
     @ObservedObject var viewModel: HotelListViewModel
     let hotel: Place
     let numberOfNights: Int
-    let numberOfPeople: Int
     
-    // Calcular el precio total
+    // Calcular el precio total (solo por noches)
     private var totalPrice: Double {
-        guard let pricePerNight = hotel.pricePerNight else { return 0 }
-        return pricePerNight * Double(numberOfNights) * Double(numberOfPeople)
+        let pricePerNight = hotel.pricePerNight ?? 0  // Si es nil, usa 0
+        return pricePerNight * Double(numberOfNights)
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            // Imagen del hotel
+            // Imagen del hotel (con tamaño fijo)
             if let firstPhoto = hotel.photos?.first {
                 AsyncImage(url: URL(string: firstPhoto.getImageURL(apiKey: NetworkService.googlePlacesAPIKey))) { image in
                     image.resizable()
-                        .scaledToFill()
-                        .frame(height: 200)  // Ajustamos el tamaño de la imagen
+                        .scaledToFill()  // Asegura que la imagen ocupe todo el espacio disponible
+                        .frame(width: UIScreen.main.bounds.width - 32, height: 180)  // Tamaño fijo para la imagen
                         .cornerRadius(10)
-                        .clipped()
+                        .clipped()  // Recorta la imagen si se desborda
                 } placeholder: {
                     ProgressView()
                         .progressViewStyle(CircularProgressViewStyle())
-                        .frame(width: UIScreen.main.bounds.width - 30, height: 200)
+                        .frame(width: UIScreen.main.bounds.width - 32, height: 180)  // Tamaño fijo para la imagen mientras se carga
                 }
             }
             
@@ -75,8 +74,9 @@ struct HotelRowView: View {
         }
         .background(Color.white)  // Fondo blanco
         .cornerRadius(15)  // Bordes redondeados
-        .shadow(radius: 8)  // Sombra suave
-        .padding(.horizontal)  // Añadimos un pequeño padding para el espacio exterior
+        .shadow(color: .black.opacity(0.2), radius: 20, x: 0, y: 10)  // Sombra más difusa y elegante
+        .padding(.horizontal, 16)  // Márgenes laterales ajustados a 16
+        .frame(maxWidth: .infinity)  // Aseguramos que las cards tengan el mismo tamaño
     }
 }
 
@@ -93,7 +93,6 @@ struct HotelRowView: View {
     )
     
     let numberOfNights = 3
-    let numberOfPeople = 2
     
-    return HotelRowView(viewModel: HotelListViewModel(), hotel: exampleHotel, numberOfNights: numberOfNights, numberOfPeople: numberOfPeople)
+    return HotelRowView(viewModel: HotelListViewModel(), hotel: exampleHotel, numberOfNights: numberOfNights)
 }

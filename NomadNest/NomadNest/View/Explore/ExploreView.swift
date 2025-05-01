@@ -33,7 +33,6 @@ struct ExploreView: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                         
                         // Encabezado de búsqueda, pasamos la opción seleccionada
-                        // Añadimos padding a los lados de SearchHeaderView
                         SearchHeaderView(searchQuery: $searchQuery)
                             .padding(.horizontal) // Esto crea un espacio en ambos laterales del SearchHeaderView
                         
@@ -62,11 +61,12 @@ struct ExploreView: View {
                                             ForEach(viewModel.destinations.filter { $0.category == category }) { destination in
                                                 NavigationLink(destination: DestinationsDetailView(destination: destination)) {
                                                     DestinationCardView(destination: destination)
+                                                        .shadow(color: .black.opacity(0.2), radius: 12, x: 0, y: 6) // Aumento del blur en sombra
                                                 }
                                                 .buttonStyle(PlainButtonStyle())
                                             }
                                         }
-                                        .padding(.horizontal)
+                                        .padding(.horizontal, 16)  // Reducir margen lateral a 16
                                     }
                                 }
                             }
@@ -117,6 +117,8 @@ struct ExploreView: View {
         }
     }
 }
+
+
 #Preview {
     ExploreView()
         .environmentObject(SuggestionViewModel.mockedInstance())

@@ -20,3 +20,10 @@ extension Color {
         self.init(red: r, green: g, blue: b)
     }
 }
+extension Date {
+    func toReadableString() -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        return formatter.string(from: self)
+    }
+}

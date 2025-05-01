@@ -248,11 +248,6 @@ class NetworkService {
                 return
             }
             
-            // Imprimir la respuesta JSON para depuración
-            if let jsonString = String(data: data, encoding: .utf8) {
-                print("Respuesta de la API: \(jsonString)")
-            }
-            
             do {
                 // Decodificar la respuesta
                 let placesResponse = try JSONDecoder().decode(GooglePlacesResponse.self, from: data)

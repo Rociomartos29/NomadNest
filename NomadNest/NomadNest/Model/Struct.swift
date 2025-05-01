@@ -149,3 +149,10 @@ struct Arrival: Decodable {
 struct FlightOffersResponse: Codable {
     let data: [Flight]
 }
+struct Reservation: Identifiable, Codable {
+    let id = UUID()
+    let hotelName: String
+    let startDate: Date
+    let endDate: Date
+    let totalPrice: Double
+}

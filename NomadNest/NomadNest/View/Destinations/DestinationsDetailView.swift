@@ -12,52 +12,51 @@ struct DestinationsDetailView: View {
     @StateObject private var viewModel = DestinationsDetailViewModel()
     
     var body: some View {
-          ScrollView {
-              VStack(alignment: .leading, spacing: 20) {
-                  // Imagen principal del destino con esquinas redondeadas
-                  AsyncImage(url: URL(string: destination.imageUrl)) { image in
-                      image.resizable()
-                          .scaledToFill()
-                          .frame(height: 250)
-                          .clipShape(RoundedRectangle(cornerRadius: 12)) // Bordes redondeados
-                          
-                  } placeholder: {
-                      Color.gray.frame(height: 250)
-                          .clipShape(RoundedRectangle(cornerRadius: 12))
-                  }
-                  
-                  // Nombre del destino
-                  Text(destination.title)
-                      .font(.largeTitle)
-                      .bold()
-                      .foregroundColor(Color(hex: "#f8be77"))
-                      .padding(.horizontal)
-                  
-                  // Descripción
-                  Text(destination.description)
-                      .font(.body)
-                      .foregroundColor(.black)
-                      .padding(.horizontal)
-                  
-                  // Mostrar ProgressView mientras carga
-                  if viewModel.isLoading {
-                      ProgressView("Cargando recomendaciones...")
-                          .padding()
-                  } else {
-                      // Secciones de recomendaciones
-                      SectionView(title: "🏨 Hoteles recomendados", places: viewModel.hotels)
-                      SectionView(title: "🍽 Restaurantes recomendados", places: viewModel.restaurants)
-                      SectionView(title: "🎢 Actividades y excursiones", places: viewModel.activities)
-                  }
-              }
-          }
-          .background(Color.white)
-          .edgesIgnoringSafeArea(.top)
-          .onAppear {
-              viewModel.fetchPlaces(for: destination)
-          }
-      }
-  }
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                // Imagen principal del destino con esquinas redondeadas
+                AsyncImage(url: URL(string: destination.imageUrl)) { image in
+                    image.resizable()
+                        .scaledToFill()
+                        .frame(height: 250)
+                        .clipShape(RoundedRectangle(cornerRadius: 12)) // Bordes redondeados
+                } placeholder: {
+                    Color.gray.frame(height: 250)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                
+                // Nombre del destino
+                Text(destination.title)
+                    .font(.largeTitle)
+                    .bold()
+                    .foregroundColor(Color(hex: "#f8be77"))
+                    .padding(.horizontal)
+                
+                // Descripción
+                Text(destination.description)
+                    .font(.body)
+                    .foregroundColor(.black)
+                    .padding(.horizontal)
+                
+                // Mostrar ProgressView mientras carga
+                if viewModel.isLoading {
+                    ProgressView("Cargando recomendaciones...")
+                        .padding()
+                } else {
+                    // Secciones de recomendaciones
+                    SectionView(title: "🏨 Hoteles recomendados", places: viewModel.hotels)
+                    SectionView(title: "🍽 Restaurantes recomendados", places: viewModel.restaurants)
+                    SectionView(title: "🎢 Actividades y excursiones", places: viewModel.activities)
+                }
+            }
+        }
+        .background(Color.white)
+        .edgesIgnoringSafeArea(.top)
+        .onAppear {
+            viewModel.fetchPlaces(for: destination)
+        }
+    }
+}
 
 // Componente reutilizable para las secciones con scroll horizontal
 struct SectionView: View {
@@ -91,7 +90,7 @@ struct SectionView: View {
                                         .frame(width: 150, height: 120) // Fijamos el tamaño de las imágenes
                                         .clipped() // Recorta lo que no encaje en el frame
                                 } placeholder: {
-                                    Color.gray.frame(width: 150, height: 120) // Placeholder también con el mismo tamaño
+                                    Color.white.frame(width: 150, height: 120) // Placeholder también con el mismo tamaño
                                 }
                             }
                             
@@ -106,7 +105,7 @@ struct SectionView: View {
                         .padding(16)  // Espaciado de 16 puntos entre las tarjetas
                         .background(Color(hex: "#4e5661"))
                         .cornerRadius(10)
-                        .shadow(radius: 5)
+                        .shadow(color: .black.opacity(0.25), radius: 15, x: 0, y: 10) // Sombra más difusa y elegante
                     }
                 }
                 .padding(.horizontal, 16)  // Aseguramos que las tarjetas tengan margen en los laterales de la pantalla

@@ -17,18 +17,13 @@ struct DestinationCardView: View {
                     .resizable()
                     .scaledToFill() // Asegura que la imagen ocupe todo el espacio disponible
                     .frame(width: 200, height: 120) // Dimensiones fijas
-                    
                     .cornerRadius(12)
-                
                     .clipped() // Recorta cualquier exceso de imagen fuera del marco
-                    
             } placeholder: {
                 Color.gray // Muestra un color de fondo mientras se carga la imagen
                     .frame(width: 200, height: 120)
                     .cornerRadius(12)
-                    
             }
-            
             
             // Título y país del destino
             Text(destination.title)
@@ -44,10 +39,10 @@ struct DestinationCardView: View {
         .frame(width: 200)
         .background(Color(hex: "#363c46")) // Fondo oscuro para las tarjetas
         .cornerRadius(12)
-        .shadow(radius: 4)
+        .shadow(color: .black.opacity(0.25), radius: 18, x: 0, y: 10)  // Sombra más difusa y elegante
+        .padding(.horizontal, 16)  // Márgenes laterales ajustados a 16
     }
 }
-
 
 #Preview {
     DestinationCardView(destination: Destination(
