@@ -26,189 +26,203 @@ struct SearchHeaderView: View {
     @State private var originQuery: String = ""
     @State private var destinationQuery: String = ""
     
+    @State private var navigateToFlights = false
+    @State private var navigateToHotelList = false
+    
     enum TravelOption {
         case hotel, flight, hotelFlight
     }
-    
-    // Usamos @State para navegar a la pantalla de HotelList
-    @State private var navigateToHotelList = false
+
     
     var body: some View {
-        VStack(spacing: 20) {
-            VStack(spacing: 10) {
-                // Botones de opciones de búsqueda
-                HStack(spacing: 20) {
-                    travelOptionButton(icon: "bed.double.fill", option: .hotel)
-                    travelOptionButton(icon: "airplane", option: .flight)
-                    travelOptionButton(icon: "bed.double.fill", secondIcon: "airplane", option: .hotelFlight)
-                }
-                .padding(8)
-                .frame(maxWidth: .infinity)
-                .background(Color.white.opacity(0.2))
-                .cornerRadius(8)
-                
-                // Caja de búsqueda para destino
-                TextField("Buscar destino...", text: $searchQuery)
-                    .padding()
-                    .background(Color.white.opacity(0.8))
-                    .cornerRadius(8)
-                    .onTapGesture {
-                        self.isEditing = true
-                    }
-                    .font(.title3)
-                    .foregroundColor(.black)
-                    .keyboardType(.default)
-                
-                // Mostrar origen solo si la opción es vuelo o vuelo + hotel
-                if selectedOption == .flight || selectedOption == .hotelFlight {
-                    TextField("Buscar origen...", text: $originQuery)
-                        .padding()
-                        .background(Color.white.opacity(0.8))
-                        .cornerRadius(8)
-                        .onTapGesture {
-                            self.isEditing = true
-                        }
-                        .font(.title3)
-                        .foregroundColor(.black)
-                        .keyboardType(.default)
-                }
-                
-                // **Las fechas siempre visibles** para todas las opciones
-                HStack {
-                    dateButton(title: "Inicio", date: $startDate, showPicker: $showStartDatePicker)
-                    dateButton(title: "Fin", date: $endDate, showPicker: $showEndDatePicker)
-                }
-                
-                // Mostrar el calendario solo cuando se toca el botón
-                if showStartDatePicker {
-                    DatePicker("", selection: $startDate, in: Date()..., displayedComponents: .date)
-                        .datePickerStyle(GraphicalDatePickerStyle())
-                        .padding()
-                        .background(Color.white.opacity(0.8))
-                        .cornerRadius(8)
-                        .onChange(of: startDate) { newDate in
-                            self.showStartDatePicker = false
-                        }
-                }
-                
-                if showEndDatePicker {
-                    DatePicker("", selection: $endDate, in: startDate..., displayedComponents: .date)
-                        .datePickerStyle(GraphicalDatePickerStyle())
-                        .padding()
-                        .background(Color.white.opacity(0.8))
-                        .cornerRadius(8)
-                        .onChange(of: endDate) { newDate in
-                            self.showEndDatePicker = false
-                        }
-                }
-                
-                // Botón para mostrar selección de pasajeros
-                Button(action: {
-                    showPassengerPicker.toggle()
-                }) {
-                    HStack {
-                        Image(systemName: "person.3.fill")
-                            .foregroundColor(Color(hex: "#f8be77"))
-                        Text("Pasajeros: \(adults) Adultos, \(children) Niños")
-                            .foregroundColor(.white)
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.white.opacity(0.2))
-                    .cornerRadius(8)
-                }
-                .sheet(isPresented: $showPassengerPicker) {
-                    VStack {
-                        Text("Selecciona los pasajeros")
-                            .font(.headline)
-                            .padding()
-                        
-                        HStack {
-                            Text("Adultos: \(adults)")
-                            Stepper("", value: $adults, in: 1...10)
-                                .labelsHidden()
-                        }
-                        .padding()
-                        
-                        HStack {
-                            Text("Niños: \(children)")
-                            Stepper("", value: $children, in: 0...10)
-                                .labelsHidden()
-                        }
-                        .padding()
-                        
-                        Button("Aceptar") {
-                            showPassengerPicker = false
-                        }
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(8)
-                    }
-                    .padding()
-                }
-                
-                // Botón de búsqueda que navega a la vista de HotelList
-                NavigationLink(destination: HotelListView(startDate: startDate, endDate: endDate, destination: searchQuery), isActive: $navigateToHotelList) {
-                    Button(action: {
-                        // Cuando se pulsa el botón de búsqueda, navegamos a HotelListView
-                        navigateToHotelList = true
-                    }) {
-                        Text("Buscar")
-                            .foregroundColor(.white)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.blue)
-                            .cornerRadius(8)
-                    }
-                }
-            }
-            .padding()
-            .background(Color(hex: "#363c46").opacity(0.9))
-            .cornerRadius(12)
-        }
-    }
-    private func travelOptionButton(icon: String, secondIcon: String? = nil, option: TravelOption) -> some View {
-        Button(action: {
-            selectedOption = option
-        }) {
-            HStack {
-                Image(systemName: icon)
-                if let secondIcon = secondIcon {
-                    Image(systemName: secondIcon)
-                }
-            }
-            .foregroundColor(Color(hex: "#f8be77"))
-            .padding()
-            .background(selectedOption == option ? Color(hex: "#363c46").opacity(0.9) : Color.clear)
-            .cornerRadius(8)
-        }
-    }
-    
-    private func dateButton(title: String, date: Binding<Date>, showPicker: Binding<Bool>) -> some View {
-        Button(action: {
-            showPicker.wrappedValue.toggle()
-        }) {
-            HStack {
-                Image(systemName: "calendar")
-                    .foregroundColor(Color(hex: "#f8be77"))
-                Text("\(title): \(formattedDate(date.wrappedValue))")
-                    .foregroundColor(.white)
-            }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color.white.opacity(0.2))
-            .cornerRadius(8)
-        }
-    }
-    
-    private func formattedDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        return formatter.string(from: date)
-    }
-}
+          VStack(spacing: 20) {
+              VStack(spacing: 10) {
+                  // Opciones de viaje
+                  HStack(spacing: 20) {
+                      travelOptionButton(icon: "bed.double.fill", option: .hotel)
+                      travelOptionButton(icon: "airplane", option: .flight)
+                      travelOptionButton(icon: "bed.double.fill", secondIcon: "airplane", option: .hotelFlight)
+                  }
+                  .padding(8)
+                  .frame(maxWidth: .infinity)
+                  .background(Color.white.opacity(0.2))
+                  .cornerRadius(8)
 
-#Preview {
-    SearchHeaderView(searchQuery: .constant(""))
-}
+                  // Buscador de destino
+                  TextField("Buscar destino...", text: $searchQuery)
+                      .padding()
+                      .background(Color.white.opacity(0.8))
+                      .cornerRadius(8)
+                      .onTapGesture { self.isEditing = true }
+                      .font(.title3)
+                      .foregroundColor(.black)
+
+                  // Solo mostrar campo de origen si aplica
+                  if selectedOption == .flight || selectedOption == .hotelFlight {
+                      TextField("Buscar origen...", text: $originQuery)
+                          .padding()
+                          .background(Color.white.opacity(0.8))
+                          .cornerRadius(8)
+                          .onTapGesture { self.isEditing = true }
+                          .font(.title3)
+                          .foregroundColor(.black)
+                  }
+
+                  // Selección de fechas
+                  HStack {
+                      dateButton(title: "Inicio", date: $startDate, showPicker: $showStartDatePicker)
+                      dateButton(title: "Fin", date: $endDate, showPicker: $showEndDatePicker)
+                  }
+
+                  if showStartDatePicker {
+                      DatePicker("", selection: $startDate, in: Date()..., displayedComponents: .date)
+                          .datePickerStyle(GraphicalDatePickerStyle())
+                          .padding()
+                          .background(Color.white.opacity(0.8))
+                          .cornerRadius(8)
+                          .onChange(of: startDate) { _ in showStartDatePicker = false }
+                  }
+
+                  if showEndDatePicker {
+                      DatePicker("", selection: $endDate, in: startDate..., displayedComponents: .date)
+                          .datePickerStyle(GraphicalDatePickerStyle())
+                          .padding()
+                          .background(Color.white.opacity(0.8))
+                          .cornerRadius(8)
+                          .onChange(of: endDate) { _ in showEndDatePicker = false }
+                  }
+
+                  // Picker de pasajeros
+                  Button(action: {
+                      showPassengerPicker.toggle()
+                  }) {
+                      HStack {
+                          Image(systemName: "person.3.fill")
+                              .foregroundColor(Color(hex: "#f8be77"))
+                          Text("Pasajeros: \(adults) Adultos, \(children) Niños")
+                              .foregroundColor(.white)
+                      }
+                      .padding()
+                      .frame(maxWidth: .infinity)
+                      .background(Color.white.opacity(0.2))
+                      .cornerRadius(8)
+                  }
+                  .sheet(isPresented: $showPassengerPicker) {
+                      VStack {
+                          Text("Selecciona los pasajeros").font(.headline).padding()
+
+                          HStack {
+                              Text("Adultos: \(adults)")
+                              Stepper("", value: $adults, in: 1...10).labelsHidden()
+                          }.padding()
+
+                          HStack {
+                              Text("Niños: \(children)")
+                              Stepper("", value: $children, in: 0...10).labelsHidden()
+                          }.padding()
+
+                          Button("Aceptar") {
+                              showPassengerPicker = false
+                          }
+                          .padding()
+                          .background(Color.blue)
+                          .foregroundColor(.white)
+                          .cornerRadius(8)
+                      }
+                      .padding()
+                  }
+
+                  // MARK: Navegación condicional
+                  NavigationLink(
+                      destination: FlightView(
+                          origin: originQuery,
+                          destination: searchQuery,
+                          departureDate: formatDateForAPI(startDate),
+                          returnDate: formatDateForAPI(endDate)
+                      ),
+                      isActive: $navigateToFlights
+                  ) { EmptyView() }
+
+                  NavigationLink(
+                      destination: HotelListView(
+                          startDate: startDate,
+                          endDate: endDate,
+                          destination: searchQuery
+                      ),
+                      isActive: $navigateToHotelList
+                  ) { EmptyView() }
+
+                  // Botón Buscar
+                  Button(action: {
+                      switch selectedOption {
+                      case .hotel:
+                          navigateToHotelList = true
+                      case .flight:
+                          navigateToFlights = true
+                      case .hotelFlight:
+                          navigateToFlights = true
+                          // Si deseas navegar a HotelListView tras ver vuelos,
+                          // deberías manejar esta lógica dentro de FlightView o usar un coordinator.
+                      }
+                  }) {
+                      Text("Buscar")
+                          .foregroundColor(.white)
+                          .padding()
+                          .frame(maxWidth: .infinity)
+                          .background(Color.blue)
+                          .cornerRadius(8)
+                  }
+              }
+              .padding()
+              .background(Color(hex: "#363c46").opacity(0.9))
+              .cornerRadius(12)
+          }
+      }
+
+      // MARK: - Funciones auxiliares
+
+      private func travelOptionButton(icon: String, secondIcon: String? = nil, option: TravelOption) -> some View {
+          Button(action: { selectedOption = option }) {
+              HStack {
+                  Image(systemName: icon)
+                  if let secondIcon = secondIcon {
+                      Image(systemName: secondIcon)
+                  }
+              }
+              .foregroundColor(Color(hex: "#f8be77"))
+              .padding()
+              .background(selectedOption == option ? Color(hex: "#363c46").opacity(0.9) : Color.clear)
+              .cornerRadius(8)
+          }
+      }
+
+      private func dateButton(title: String, date: Binding<Date>, showPicker: Binding<Bool>) -> some View {
+          Button(action: { showPicker.wrappedValue.toggle() }) {
+              HStack {
+                  Image(systemName: "calendar").foregroundColor(Color(hex: "#f8be77"))
+                  Text("\(title): \(formattedDate(date.wrappedValue))")
+                      .foregroundColor(.white)
+              }
+              .padding()
+              .frame(maxWidth: .infinity)
+              .background(Color.white.opacity(0.2))
+              .cornerRadius(8)
+          }
+      }
+
+      private func formattedDate(_ date: Date) -> String {
+          let formatter = DateFormatter()
+          formatter.dateStyle = .medium
+          return formatter.string(from: date)
+      }
+
+      private func formatDateForAPI(_ date: Date) -> String {
+          let formatter = DateFormatter()
+          formatter.dateFormat = "yyyy-MM-dd"
+          return formatter.string(from: date)
+      }
+  }
+
+  #Preview {
+      SearchHeaderView(searchQuery: .constant(""))
+  }
